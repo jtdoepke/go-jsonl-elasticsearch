@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "bytes"
+        _ "bytes"
 	"context"
 	"encoding/json"
 	"flag"
@@ -111,9 +111,9 @@ func main() {
 			count += 1
 		}
 
-		log.Printf("Wrote %d (%d) records\n", count, es_response.Hits.Total)
+		log.Printf("Wrote %d (%d) records\n", count, es_response.Hits.Total.Value)
 
-		if count >= es_response.Hits.Total {
+		if count >= es_response.Hits.Total.Value {
 			break
 		}
 

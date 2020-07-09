@@ -5,8 +5,13 @@ type ESResponse struct {
 	Hits     ESResponseHits `json:"hits"`
 }
 
+type ESTotal struct {
+     Value int `json:"value"`
+     Relation string `json:"relation"`
+}
+
 type ESResponseHits struct {
-	Total int     `json:"total"`
+	Total ESTotal     `json:"total"`
 	Hits  []ESHit `json:"hits"`
 }
 
