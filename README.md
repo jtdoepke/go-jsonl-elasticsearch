@@ -1,6 +1,6 @@
 # go-jsonl-elasticsearch
 
-Go package for working with line-delimited JSON files in an Elasticsearch context.
+Go package for working with line-delimited JSON files in an Elasticsearch (7.x) context.
 
 ## Important
 
@@ -15,6 +15,8 @@ go build -mod vendor -o bin/restore cmd/restore/main.go
 ```
   
 ### dump
+
+Export an Elasticsearch index as line-separated JSON.
 
 ```
 $> bin/dump \
@@ -33,8 +35,15 @@ $> bin/dump \
 
 ### restore
 
+Restore an Elasticsearch index from line-separated JSON (produced by the `dump` tool).
+
 ```
-$> ./bin/restore -elasticsearch-endpoint http://localhost:9200 -elasticsearch-index millsfield -is-bzip /usr/local/data/millsfield.bz2
+$> ./bin/restore \
+	-elasticsearch-endpoint http://localhost:9200 \
+	-elasticsearch-index millsfield \
+	-is-bzip \
+	/usr/local/data/millsfield.bz2
+
 {
   "NumAdded": 55658,
   "NumFlushed": 55658,
@@ -50,3 +59,4 @@ $> ./bin/restore -elasticsearch-endpoint http://localhost:9200 -elasticsearch-in
 ## See also
 
 * https://github.com/aaronland/go-jsonl
+* https://github.com/elastic/go-elasticsearch
