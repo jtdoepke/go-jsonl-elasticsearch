@@ -31,6 +31,22 @@ $> bin/dump \
 2020/07/09 13:30:29 Wrote 55658 (55658) records
 ```
 
+### restore
+
+```
+$> ./bin/restore -elasticsearch-endpoint http://localhost:9200 -elasticsearch-index millsfield -is-bzip /usr/local/data/millsfield.bz2
+{
+  "NumAdded": 55658,
+  "NumFlushed": 55658,
+  "NumFailed": 0,
+  "NumIndexed": 55658,
+  "NumCreated": 0,
+  "NumUpdated": 0,
+  "NumDeleted": 0,
+  "NumRequests": 31
+}
+```
+
 ## See also
 
 * https://github.com/aaronland/go-jsonl

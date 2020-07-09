@@ -3,15 +3,15 @@ package main
 import (
 	"bytes"
 	"context"
-	_ "crypto/sha256"
 	"encoding/json"
 	"flag"
-	_ "fmt"
+	"fmt"
 	"github.com/aaronland/go-jsonl-elasticsearch/model"
 	"github.com/aaronland/go-jsonl/walk"
 	"github.com/cenkalti/backoff/v4"
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/elastic/go-elasticsearch/v7/esutil"
+	"github.com/tidwall/pretty"
 	"log"
 	"os"
 	"runtime"
@@ -84,9 +84,7 @@ func main() {
 				err := json.Unmarshal(rec.Body, &doc)
 
 				if err != nil {
-
 					log.Printf("Failed to unmarshal document, %v", err)
-
 				} else {
 
 					doc_id := doc.ID
@@ -123,7 +121,6 @@ func main() {
 					}
 				}
 
-				// log.Println("SCHEDULED", doc_id)
 			}
 		}
 	}()
@@ -158,5 +155,13 @@ func main() {
 	}
 
 	stats := bi.Stats()
-	log.Println(stats)
+
+	enc_stats, err := json.Marshal(stats)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	enc_stats = pretty.Pretty(enc_stats)
+	fmt.Println(string(enc_stats))
 }

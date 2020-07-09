@@ -1,7 +1,7 @@
 package main
 
 import (
-        _ "bytes"
+	_ "bytes"
 	"context"
 	"encoding/json"
 	"flag"
@@ -22,8 +22,8 @@ func main() {
 	es_endpoint := flag.String("elasticsearch-endpoint", "", "The name of the Elasticsearch host to query.")
 	es_index := flag.String("elasticsearch-index", "", "The name of the Elasticsearch index to dump.")
 
-	null := flag.Bool("null", false, "...")
-	stdout := flag.Bool("stdout", true, "...")
+	null := flag.Bool("null", false, "Output to /dev/null.")
+	stdout := flag.Bool("stdout", true, "Output to STDOUT.")
 
 	flag.Parse()
 
@@ -99,7 +99,7 @@ func main() {
 
 		for _, rec := range es_response.Hits.Hits {
 
-			enc_rec, err := json.Marshal(rec.Source)
+			enc_rec, err := json.Marshal(rec)
 
 			if err != nil {
 				log.Fatal(err)
