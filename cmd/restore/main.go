@@ -3,9 +3,11 @@ package main
 import (
 	"bytes"
 	"context"
-	"crypto/sha256"
+	_ "crypto/sha256"
+	"encoding/json"
 	"flag"
-	"fmt"
+	_ "fmt"
+	"github.com/aaronland/go-jsonl-elasticsearch/model"
 	"github.com/aaronland/go-jsonl/walk"
 	"github.com/cenkalti/backoff/v4"
 	"github.com/elastic/go-elasticsearch/v7"
@@ -77,34 +79,48 @@ func main() {
 				log.Println(err)
 			case rec := <-record_ch:
 
-				hash := sha256.Sum256(rec.Body)
-				doc_id := fmt.Sprintf("%x", hash[:])
+				var doc *model.ESHit
 
-				br := bytes.NewReader(rec.Body)
-				path := "n/a"
-
-				bulk_item := esutil.BulkIndexerItem{
-					Action:     "index",
-					DocumentID: doc_id,
-					Body:       br,
-
-					OnSuccess: func(ctx context.Context, item esutil.BulkIndexerItem, res esutil.BulkIndexerResponseItem) {
-						// log.Printf("Indexed %s\n", path)
-					},
-
-					OnFailure: func(ctx context.Context, item esutil.BulkIndexerItem, res esutil.BulkIndexerResponseItem, err error) {
-						if err != nil {
-							log.Printf("ERROR: Failed to index %s, %s", path, err)
-						} else {
-							log.Printf("ERROR: Failed to index %s, %s: %s", path, res.Error.Type, res.Error.Reason)
-						}
-					},
-				}
-
-				err = bi.Add(ctx, bulk_item)
+				err := json.Unmarshal(rec.Body, &doc)
 
 				if err != nil {
-					log.Printf("Failed to schedule %s, %v", path, err)
+
+					log.Printf("Failed to unmarshal document, %v", err)
+
+				} else {
+
+					doc_id := doc.ID
+					doc_body, _ := json.Marshal(doc.Source)
+
+					// hash := sha256.Sum256(rec.Body)
+					// doc_id := fmt.Sprintf("%x", hash[:])
+
+					br := bytes.NewReader(doc_body)
+					path := "n/a"
+
+					bulk_item := esutil.BulkIndexerItem{
+						Action:     "index",
+						DocumentID: doc_id,
+						Body:       br,
+
+						OnSuccess: func(ctx context.Context, item esutil.BulkIndexerItem, res esutil.BulkIndexerResponseItem) {
+							// log.Printf("Indexed %s\n", path)
+						},
+
+						OnFailure: func(ctx context.Context, item esutil.BulkIndexerItem, res esutil.BulkIndexerResponseItem, err error) {
+							if err != nil {
+								log.Printf("ERROR: Failed to index %s, %s", path, err)
+							} else {
+								log.Printf("ERROR: Failed to index %s, %s: %s", path, res.Error.Type, res.Error.Reason)
+							}
+						},
+					}
+
+					err = bi.Add(ctx, bulk_item)
+
+					if err != nil {
+						log.Printf("Failed to schedule %s, %v", path, err)
+					}
 				}
 
 				// log.Println("SCHEDULED", doc_id)

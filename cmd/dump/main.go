@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/aaronland/go-jsonl-elasticsearch/model"
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/elastic/go-elasticsearch/v7/esapi"
 	"io"
@@ -15,20 +16,6 @@ import (
 	"strings"
 	"time"
 )
-
-type ESResponse struct {
-	ScrollID string         `json:"_scroll_id"`
-	Hits     ESResponseHits `json:"hits"`
-}
-
-type ESResponseHits struct {
-	Total int     `json:"total"`
-	Hits  []ESHit `json:"hits"`
-}
-
-type ESHit struct {
-	Source interface{} `json:"_source"`
-}
 
 func main() {
 
@@ -101,7 +88,7 @@ func main() {
 
 		defer rsp.Body.Close()
 
-		var es_response *ESResponse
+		var es_response *model.ESResponse
 
 		dec := json.NewDecoder(rsp.Body)
 		err = dec.Decode(&es_response)
