@@ -1,4 +1,4 @@
-module github.com/aaronland/go-jsonl-elasticsearch
+module github.com/sfomuseum/go-jsonl-elasticsearch
 
 go 1.12
 

@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/aaronland/go-jsonl-elasticsearch/model"
+	"github.com/sfomuseum/go-jsonl-elasticsearch/model"
 	"github.com/aaronland/go-jsonl/walk"
 	"github.com/cenkalti/backoff/v4"
 	"github.com/elastic/go-elasticsearch/v7"
