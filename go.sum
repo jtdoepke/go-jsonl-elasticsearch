@@ -21,8 +21,12 @@ github.com/Azure/go-autorest v12.0.0+incompatible/go.mod h1:r+4oMnoxhatjLLJ6zxSW
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/GoogleCloudPlatform/cloudsql-proxy v0.0.0-20191009163259-e802c2cb94ae/go.mod h1:mjwGPas4yKduTyubHvD1Atl9r1rUq8DfVy+gkVvZ+oo=
+github.com/aaronland/go-json-query v0.0.1 h1:O38uHGRULiOFzpGAnZsG5bZgC0sDkgXc2GefB6hTTko=
+github.com/aaronland/go-json-query v0.0.1/go.mod h1:dGc7y824R93ugQMTldL7PFD/SPVGPwKdqrUJFLE/ILU=
 github.com/aaronland/go-jsonl v0.0.4 h1:Cf85g/G1Qnn2eXdT6lQJD66fth6NxAm4Iu8XrITFxU8=
 github.com/aaronland/go-jsonl v0.0.4/go.mod h1:aitHRY9ZHBvN2DgD+cyZpLgEjBKMcFJWgv8zW4oCxgc=
+github.com/aaronland/go-jsonl v0.0.6 h1:9J4u/Y1/SIPjRjyUVBM3iv2DR//8Z+4qpB1FNnJ7kfQ=
+github.com/aaronland/go-jsonl v0.0.6/go.mod h1:hnG6xP9SzDNRQgm5tY4OeJ5qhHwsDUt6W/IDQcabpw4=
 github.com/aws/aws-sdk-go v1.15.27/go.mod h1:mFuSZ37Z9YOHbQEwBWztmVzqXrEkub65tZoCYDt7FT0=
 github.com/aws/aws-sdk-go v1.19.18/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN924inxo=
 github.com/aws/aws-sdk-go v1.19.45/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN924inxo=

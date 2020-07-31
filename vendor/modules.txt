@@ -1,4 +1,6 @@
-# github.com/aaronland/go-jsonl v0.0.4
+# github.com/aaronland/go-json-query v0.0.1
+github.com/aaronland/go-json-query
+# github.com/aaronland/go-jsonl v0.0.6
 github.com/aaronland/go-jsonl/walk
 # github.com/cenkalti/backoff/v4 v4.0.2
 github.com/cenkalti/backoff/v4
