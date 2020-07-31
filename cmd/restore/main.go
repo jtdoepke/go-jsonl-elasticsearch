@@ -6,11 +6,11 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/sfomuseum/go-jsonl-elasticsearch/model"
 	"github.com/aaronland/go-jsonl/walk"
 	"github.com/cenkalti/backoff/v4"
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/elastic/go-elasticsearch/v7/esutil"
+	"github.com/sfomuseum/go-jsonl-elasticsearch/model"
 	"github.com/tidwall/pretty"
 	"log"
 	"os"
@@ -23,9 +23,10 @@ func main() {
 	es_endpoint := flag.String("elasticsearch-endpoint", "", "The name of the Elasticsearch host to query.")
 	es_index := flag.String("elasticsearch-index", "", "The name of the Elasticsearch index to dump.")
 
-	workers := flag.Int("workers", runtime.NumCPU(), "...")
-	validate_json := flag.Bool("validate-json", false, "...")
-	is_bzip := flag.Bool("is-bzip", false, "...")
+	workers := flag.Int("workers", runtime.NumCPU(), "The number of concurrent processes to use when indexing data.")
+	validate_json := flag.Bool("validate-json", false, "Ensure each record is valid JSON.")
+	is_bzip := flag.Bool("is-bzip", false, "Signal that the data is compressed using bzip2 encoding.")
+	stdin := flag.Bool("stdin", false, "Read data from STDIN")
 
 	flag.Parse()
 
@@ -136,14 +137,21 @@ func main() {
 
 	uris := flag.Args()
 
-	for _, uri := range uris {
+	if *stdin {
+		walk.WalkReader(ctx, walk_opts, os.Stdin)
 
-		fh, err := os.Open(uri)
+	} else {
 
-		if err != nil {
-			log.Fatal(err)
+		for _, uri := range uris {
+
+			fh, err := os.Open(uri)
+
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			walk.WalkReader(ctx, walk_opts, fh)
 		}
-		walk.WalkReader(ctx, walk_opts, fh)
 	}
 
 	done_ch <- true

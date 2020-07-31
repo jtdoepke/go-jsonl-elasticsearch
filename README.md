@@ -2,11 +2,9 @@
 
 Go package for working with line-delimited JSON files in an Elasticsearch (7.x) context.
 
-## Important
-
-Work in progress. Documentation to follow.
-
 ## Tools
+
+To build binary versions of these tools run the `cli` Makefile target. For example:
 
 ```
 $> make cli
@@ -17,6 +15,21 @@ go build -mod vendor -o bin/restore cmd/restore/main.go
 ### dump
 
 Export an Elasticsearch index as line-separated JSON.
+
+```
+$> bin/dump -h
+Usage of ./bin/dump:
+  -elasticsearch-endpoint string
+    	The name of the Elasticsearch host to query.
+  -elasticsearch-index string
+    	The name of the Elasticsearch index to dump.
+  -null
+    	Output to /dev/null.
+  -stdout
+    	Output to STDOUT. (default true)
+```
+
+For example:
 
 ```
 $> bin/dump \
@@ -36,6 +49,25 @@ $> bin/dump \
 ### restore
 
 Restore an Elasticsearch index from line-separated JSON (produced by the `dump` tool).
+
+```
+$> bin/restore -h
+Usage of ./bin/restore:
+  -elasticsearch-endpoint string
+    	The name of the Elasticsearch host to query.
+  -elasticsearch-index string
+    	The name of the Elasticsearch index to dump.
+  -is-bzip
+    	Signal that the data is compressed using bzip2 encoding.
+  -stdin
+    	Read data from STDIN
+  -validate-json
+    	Ensure each record is valid JSON.
+  -workers int
+    	The number of concurrent processes to use when indexing data. (default 4)
+```
+
+For example:
 
 ```
 $> ./bin/restore \
