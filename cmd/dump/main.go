@@ -119,11 +119,15 @@ func writeDocuments(ctx context.Context, c <-chan *model.ESResponse) error {
 	}
 	wr := io.MultiWriter(writers...)
 
+outer:
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
-		case resp := <-c:
+		case resp, ok := <-c:
+			if !ok {
+				break outer
+			}
 			for _, rec := range resp.Hits.Hits {
 				enc_rec, err := json.Marshal(rec)
 				if err != nil {
@@ -135,6 +139,7 @@ func writeDocuments(ctx context.Context, c <-chan *model.ESResponse) error {
 			PutResponse(resp)
 		}
 	}
+	return nil
 }
 
 var (
