@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -28,15 +41,14 @@ func newCatMLDatafeedsFunc(t Transport) CatMLDatafeeds {
 // CatMLDatafeeds - Gets configuration and usage information about datafeeds.
 //
 // See full documentation at http://www.elastic.co/guide/en/elasticsearch/reference/current/cat-datafeeds.html.
-//
 type CatMLDatafeeds func(o ...func(*CatMLDatafeedsRequest)) (*Response, error)
 
 // CatMLDatafeedsRequest configures the CatML Datafeeds API request.
-//
 type CatMLDatafeedsRequest struct {
 	DatafeedID string
 
 	AllowNoDatafeeds *bool
+	AllowNoMatch     *bool
 	Format           string
 	H                []string
 	Help             *bool
@@ -55,7 +67,6 @@ type CatMLDatafeedsRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r CatMLDatafeedsRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -81,6 +92,10 @@ func (r CatMLDatafeedsRequest) Do(ctx context.Context, transport Transport) (*Re
 
 	if r.AllowNoDatafeeds != nil {
 		params["allow_no_datafeeds"] = strconv.FormatBool(*r.AllowNoDatafeeds)
+	}
+
+	if r.AllowNoMatch != nil {
+		params["allow_no_match"] = strconv.FormatBool(*r.AllowNoMatch)
 	}
 
 	if r.Format != "" {
@@ -167,7 +182,6 @@ func (r CatMLDatafeedsRequest) Do(ctx context.Context, transport Transport) (*Re
 }
 
 // WithContext sets the request context.
-//
 func (f CatMLDatafeeds) WithContext(v context.Context) func(*CatMLDatafeedsRequest) {
 	return func(r *CatMLDatafeedsRequest) {
 		r.ctx = v
@@ -175,7 +189,6 @@ func (f CatMLDatafeeds) WithContext(v context.Context) func(*CatMLDatafeedsReque
 }
 
 // WithDatafeedID - the ID of the datafeeds stats to fetch.
-//
 func (f CatMLDatafeeds) WithDatafeedID(v string) func(*CatMLDatafeedsRequest) {
 	return func(r *CatMLDatafeedsRequest) {
 		r.DatafeedID = v
@@ -183,15 +196,20 @@ func (f CatMLDatafeeds) WithDatafeedID(v string) func(*CatMLDatafeedsRequest) {
 }
 
 // WithAllowNoDatafeeds - whether to ignore if a wildcard expression matches no datafeeds. (this includes `_all` string or when no datafeeds have been specified).
-//
 func (f CatMLDatafeeds) WithAllowNoDatafeeds(v bool) func(*CatMLDatafeedsRequest) {
 	return func(r *CatMLDatafeedsRequest) {
 		r.AllowNoDatafeeds = &v
 	}
 }
 
+// WithAllowNoMatch - whether to ignore if a wildcard expression matches no datafeeds. (this includes `_all` string or when no datafeeds have been specified).
+func (f CatMLDatafeeds) WithAllowNoMatch(v bool) func(*CatMLDatafeedsRequest) {
+	return func(r *CatMLDatafeedsRequest) {
+		r.AllowNoMatch = &v
+	}
+}
+
 // WithFormat - a short version of the accept header, e.g. json, yaml.
-//
 func (f CatMLDatafeeds) WithFormat(v string) func(*CatMLDatafeedsRequest) {
 	return func(r *CatMLDatafeedsRequest) {
 		r.Format = v
@@ -199,7 +217,6 @@ func (f CatMLDatafeeds) WithFormat(v string) func(*CatMLDatafeedsRequest) {
 }
 
 // WithH - comma-separated list of column names to display.
-//
 func (f CatMLDatafeeds) WithH(v ...string) func(*CatMLDatafeedsRequest) {
 	return func(r *CatMLDatafeedsRequest) {
 		r.H = v
@@ -207,7 +224,6 @@ func (f CatMLDatafeeds) WithH(v ...string) func(*CatMLDatafeedsRequest) {
 }
 
 // WithHelp - return help information.
-//
 func (f CatMLDatafeeds) WithHelp(v bool) func(*CatMLDatafeedsRequest) {
 	return func(r *CatMLDatafeedsRequest) {
 		r.Help = &v
@@ -215,7 +231,6 @@ func (f CatMLDatafeeds) WithHelp(v bool) func(*CatMLDatafeedsRequest) {
 }
 
 // WithS - comma-separated list of column names or column aliases to sort by.
-//
 func (f CatMLDatafeeds) WithS(v ...string) func(*CatMLDatafeedsRequest) {
 	return func(r *CatMLDatafeedsRequest) {
 		r.S = v
@@ -223,7 +238,6 @@ func (f CatMLDatafeeds) WithS(v ...string) func(*CatMLDatafeedsRequest) {
 }
 
 // WithTime - the unit in which to display time values.
-//
 func (f CatMLDatafeeds) WithTime(v string) func(*CatMLDatafeedsRequest) {
 	return func(r *CatMLDatafeedsRequest) {
 		r.Time = v
@@ -231,7 +245,6 @@ func (f CatMLDatafeeds) WithTime(v string) func(*CatMLDatafeedsRequest) {
 }
 
 // WithV - verbose mode. display column headers.
-//
 func (f CatMLDatafeeds) WithV(v bool) func(*CatMLDatafeedsRequest) {
 	return func(r *CatMLDatafeedsRequest) {
 		r.V = &v
@@ -239,7 +252,6 @@ func (f CatMLDatafeeds) WithV(v bool) func(*CatMLDatafeedsRequest) {
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f CatMLDatafeeds) WithPretty() func(*CatMLDatafeedsRequest) {
 	return func(r *CatMLDatafeedsRequest) {
 		r.Pretty = true
@@ -247,7 +259,6 @@ func (f CatMLDatafeeds) WithPretty() func(*CatMLDatafeedsRequest) {
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f CatMLDatafeeds) WithHuman() func(*CatMLDatafeedsRequest) {
 	return func(r *CatMLDatafeedsRequest) {
 		r.Human = true
@@ -255,7 +266,6 @@ func (f CatMLDatafeeds) WithHuman() func(*CatMLDatafeedsRequest) {
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f CatMLDatafeeds) WithErrorTrace() func(*CatMLDatafeedsRequest) {
 	return func(r *CatMLDatafeedsRequest) {
 		r.ErrorTrace = true
@@ -263,7 +273,6 @@ func (f CatMLDatafeeds) WithErrorTrace() func(*CatMLDatafeedsRequest) {
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f CatMLDatafeeds) WithFilterPath(v ...string) func(*CatMLDatafeedsRequest) {
 	return func(r *CatMLDatafeedsRequest) {
 		r.FilterPath = v
@@ -271,7 +280,6 @@ func (f CatMLDatafeeds) WithFilterPath(v ...string) func(*CatMLDatafeedsRequest)
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f CatMLDatafeeds) WithHeader(h map[string]string) func(*CatMLDatafeedsRequest) {
 	return func(r *CatMLDatafeedsRequest) {
 		if r.Header == nil {
@@ -284,7 +292,6 @@ func (f CatMLDatafeeds) WithHeader(h map[string]string) func(*CatMLDatafeedsRequ
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f CatMLDatafeeds) WithOpaqueID(s string) func(*CatMLDatafeedsRequest) {
 	return func(r *CatMLDatafeedsRequest) {
 		if r.Header == nil {

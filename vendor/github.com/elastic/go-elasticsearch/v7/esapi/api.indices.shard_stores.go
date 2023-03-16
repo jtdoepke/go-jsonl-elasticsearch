@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -28,11 +41,9 @@ func newIndicesShardStoresFunc(t Transport) IndicesShardStores {
 // IndicesShardStores provides store information for shard copies of indices.
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-shards-stores.html.
-//
 type IndicesShardStores func(o ...func(*IndicesShardStoresRequest)) (*Response, error)
 
 // IndicesShardStoresRequest configures the Indices Shard Stores API request.
-//
 type IndicesShardStoresRequest struct {
 	Index []string
 
@@ -52,7 +63,6 @@ type IndicesShardStoresRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r IndicesShardStoresRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -148,7 +158,6 @@ func (r IndicesShardStoresRequest) Do(ctx context.Context, transport Transport) 
 }
 
 // WithContext sets the request context.
-//
 func (f IndicesShardStores) WithContext(v context.Context) func(*IndicesShardStoresRequest) {
 	return func(r *IndicesShardStoresRequest) {
 		r.ctx = v
@@ -156,7 +165,6 @@ func (f IndicesShardStores) WithContext(v context.Context) func(*IndicesShardSto
 }
 
 // WithIndex - a list of index names; use _all to perform the operation on all indices.
-//
 func (f IndicesShardStores) WithIndex(v ...string) func(*IndicesShardStoresRequest) {
 	return func(r *IndicesShardStoresRequest) {
 		r.Index = v
@@ -164,7 +172,6 @@ func (f IndicesShardStores) WithIndex(v ...string) func(*IndicesShardStoresReque
 }
 
 // WithAllowNoIndices - whether to ignore if a wildcard indices expression resolves into no concrete indices. (this includes `_all` string or when no indices have been specified).
-//
 func (f IndicesShardStores) WithAllowNoIndices(v bool) func(*IndicesShardStoresRequest) {
 	return func(r *IndicesShardStoresRequest) {
 		r.AllowNoIndices = &v
@@ -172,7 +179,6 @@ func (f IndicesShardStores) WithAllowNoIndices(v bool) func(*IndicesShardStoresR
 }
 
 // WithExpandWildcards - whether to expand wildcard expression to concrete indices that are open, closed or both..
-//
 func (f IndicesShardStores) WithExpandWildcards(v string) func(*IndicesShardStoresRequest) {
 	return func(r *IndicesShardStoresRequest) {
 		r.ExpandWildcards = v
@@ -180,7 +186,6 @@ func (f IndicesShardStores) WithExpandWildcards(v string) func(*IndicesShardStor
 }
 
 // WithIgnoreUnavailable - whether specified concrete indices should be ignored when unavailable (missing or closed).
-//
 func (f IndicesShardStores) WithIgnoreUnavailable(v bool) func(*IndicesShardStoresRequest) {
 	return func(r *IndicesShardStoresRequest) {
 		r.IgnoreUnavailable = &v
@@ -188,7 +193,6 @@ func (f IndicesShardStores) WithIgnoreUnavailable(v bool) func(*IndicesShardStor
 }
 
 // WithStatus - a list of statuses used to filter on shards to get store information for.
-//
 func (f IndicesShardStores) WithStatus(v ...string) func(*IndicesShardStoresRequest) {
 	return func(r *IndicesShardStoresRequest) {
 		r.Status = v
@@ -196,7 +200,6 @@ func (f IndicesShardStores) WithStatus(v ...string) func(*IndicesShardStoresRequ
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f IndicesShardStores) WithPretty() func(*IndicesShardStoresRequest) {
 	return func(r *IndicesShardStoresRequest) {
 		r.Pretty = true
@@ -204,7 +207,6 @@ func (f IndicesShardStores) WithPretty() func(*IndicesShardStoresRequest) {
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f IndicesShardStores) WithHuman() func(*IndicesShardStoresRequest) {
 	return func(r *IndicesShardStoresRequest) {
 		r.Human = true
@@ -212,7 +214,6 @@ func (f IndicesShardStores) WithHuman() func(*IndicesShardStoresRequest) {
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f IndicesShardStores) WithErrorTrace() func(*IndicesShardStoresRequest) {
 	return func(r *IndicesShardStoresRequest) {
 		r.ErrorTrace = true
@@ -220,7 +221,6 @@ func (f IndicesShardStores) WithErrorTrace() func(*IndicesShardStoresRequest) {
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f IndicesShardStores) WithFilterPath(v ...string) func(*IndicesShardStoresRequest) {
 	return func(r *IndicesShardStoresRequest) {
 		r.FilterPath = v
@@ -228,7 +228,6 @@ func (f IndicesShardStores) WithFilterPath(v ...string) func(*IndicesShardStores
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f IndicesShardStores) WithHeader(h map[string]string) func(*IndicesShardStoresRequest) {
 	return func(r *IndicesShardStoresRequest) {
 		if r.Header == nil {
@@ -241,7 +240,6 @@ func (f IndicesShardStores) WithHeader(h map[string]string) func(*IndicesShardSt
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f IndicesShardStores) WithOpaqueID(s string) func(*IndicesShardStoresRequest) {
 	return func(r *IndicesShardStoresRequest) {
 		if r.Header == nil {

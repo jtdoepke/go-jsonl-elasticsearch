@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -33,11 +46,9 @@ func newReindexFunc(t Transport) Reindex {
 // documents from a remote cluster.
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-reindex.html.
-//
 type Reindex func(body io.Reader, o ...func(*ReindexRequest)) (*Response, error)
 
 // ReindexRequest configures the Reindex API request.
-//
 type ReindexRequest struct {
 	Body io.Reader
 
@@ -61,7 +72,6 @@ type ReindexRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r ReindexRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -137,10 +147,6 @@ func (r ReindexRequest) Do(ctx context.Context, transport Transport) (*Response,
 		req.URL.RawQuery = q.Encode()
 	}
 
-	if r.Body != nil {
-		req.Header[headerContentType] = headerContentTypeJSON
-	}
-
 	if len(r.Header) > 0 {
 		if len(req.Header) == 0 {
 			req.Header = r.Header
@@ -151,6 +157,10 @@ func (r ReindexRequest) Do(ctx context.Context, transport Transport) (*Response,
 				}
 			}
 		}
+	}
+
+	if r.Body != nil && req.Header.Get(headerContentType) == "" {
+		req.Header[headerContentType] = headerContentTypeJSON
 	}
 
 	if ctx != nil {
@@ -172,7 +182,6 @@ func (r ReindexRequest) Do(ctx context.Context, transport Transport) (*Response,
 }
 
 // WithContext sets the request context.
-//
 func (f Reindex) WithContext(v context.Context) func(*ReindexRequest) {
 	return func(r *ReindexRequest) {
 		r.ctx = v
@@ -180,7 +189,6 @@ func (f Reindex) WithContext(v context.Context) func(*ReindexRequest) {
 }
 
 // WithMaxDocs - maximum number of documents to process (default: all documents).
-//
 func (f Reindex) WithMaxDocs(v int) func(*ReindexRequest) {
 	return func(r *ReindexRequest) {
 		r.MaxDocs = &v
@@ -188,7 +196,6 @@ func (f Reindex) WithMaxDocs(v int) func(*ReindexRequest) {
 }
 
 // WithRefresh - should the affected indexes be refreshed?.
-//
 func (f Reindex) WithRefresh(v bool) func(*ReindexRequest) {
 	return func(r *ReindexRequest) {
 		r.Refresh = &v
@@ -196,7 +203,6 @@ func (f Reindex) WithRefresh(v bool) func(*ReindexRequest) {
 }
 
 // WithRequestsPerSecond - the throttle to set on this request in sub-requests per second. -1 means no throttle..
-//
 func (f Reindex) WithRequestsPerSecond(v int) func(*ReindexRequest) {
 	return func(r *ReindexRequest) {
 		r.RequestsPerSecond = &v
@@ -204,7 +210,6 @@ func (f Reindex) WithRequestsPerSecond(v int) func(*ReindexRequest) {
 }
 
 // WithScroll - control how long to keep the search context alive.
-//
 func (f Reindex) WithScroll(v time.Duration) func(*ReindexRequest) {
 	return func(r *ReindexRequest) {
 		r.Scroll = v
@@ -212,7 +217,6 @@ func (f Reindex) WithScroll(v time.Duration) func(*ReindexRequest) {
 }
 
 // WithSlices - the number of slices this task should be divided into. defaults to 1, meaning the task isn't sliced into subtasks. can be set to `auto`..
-//
 func (f Reindex) WithSlices(v interface{}) func(*ReindexRequest) {
 	return func(r *ReindexRequest) {
 		r.Slices = v
@@ -220,7 +224,6 @@ func (f Reindex) WithSlices(v interface{}) func(*ReindexRequest) {
 }
 
 // WithTimeout - time each individual bulk request should wait for shards that are unavailable..
-//
 func (f Reindex) WithTimeout(v time.Duration) func(*ReindexRequest) {
 	return func(r *ReindexRequest) {
 		r.Timeout = v
@@ -228,7 +231,6 @@ func (f Reindex) WithTimeout(v time.Duration) func(*ReindexRequest) {
 }
 
 // WithWaitForActiveShards - sets the number of shard copies that must be active before proceeding with the reindex operation. defaults to 1, meaning the primary shard only. set to `all` for all shard copies, otherwise set to any non-negative value less than or equal to the total number of copies for the shard (number of replicas + 1).
-//
 func (f Reindex) WithWaitForActiveShards(v string) func(*ReindexRequest) {
 	return func(r *ReindexRequest) {
 		r.WaitForActiveShards = v
@@ -236,7 +238,6 @@ func (f Reindex) WithWaitForActiveShards(v string) func(*ReindexRequest) {
 }
 
 // WithWaitForCompletion - should the request should block until the reindex is complete..
-//
 func (f Reindex) WithWaitForCompletion(v bool) func(*ReindexRequest) {
 	return func(r *ReindexRequest) {
 		r.WaitForCompletion = &v
@@ -244,7 +245,6 @@ func (f Reindex) WithWaitForCompletion(v bool) func(*ReindexRequest) {
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f Reindex) WithPretty() func(*ReindexRequest) {
 	return func(r *ReindexRequest) {
 		r.Pretty = true
@@ -252,7 +252,6 @@ func (f Reindex) WithPretty() func(*ReindexRequest) {
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f Reindex) WithHuman() func(*ReindexRequest) {
 	return func(r *ReindexRequest) {
 		r.Human = true
@@ -260,7 +259,6 @@ func (f Reindex) WithHuman() func(*ReindexRequest) {
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f Reindex) WithErrorTrace() func(*ReindexRequest) {
 	return func(r *ReindexRequest) {
 		r.ErrorTrace = true
@@ -268,7 +266,6 @@ func (f Reindex) WithErrorTrace() func(*ReindexRequest) {
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f Reindex) WithFilterPath(v ...string) func(*ReindexRequest) {
 	return func(r *ReindexRequest) {
 		r.FilterPath = v
@@ -276,7 +273,6 @@ func (f Reindex) WithFilterPath(v ...string) func(*ReindexRequest) {
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f Reindex) WithHeader(h map[string]string) func(*ReindexRequest) {
 	return func(r *ReindexRequest) {
 		if r.Header == nil {
@@ -289,7 +285,6 @@ func (f Reindex) WithHeader(h map[string]string) func(*ReindexRequest) {
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f Reindex) WithOpaqueID(s string) func(*ReindexRequest) {
 	return func(r *ReindexRequest) {
 		if r.Header == nil {

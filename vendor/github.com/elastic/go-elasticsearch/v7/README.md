@@ -4,26 +4,27 @@ The official Go client for [Elasticsearch](https://www.elastic.co/products/elast
 
 [![GoDoc](https://godoc.org/github.com/elastic/go-elasticsearch?status.svg)](https://pkg.go.dev/github.com/elastic/go-elasticsearch/v7)
 [![Go Report Card](https://goreportcard.com/badge/github.com/elastic/go-elasticsearch)](https://goreportcard.com/report/github.com/elastic/go-elasticsearch)
-[![codecov.io](https://codecov.io/github/elastic/go-elasticsearch/coverage.svg?branch=master)](https://codecov.io/gh/elastic/go-elasticsearch?branch=master)
-[![Build](https://github.com/elastic/go-elasticsearch/workflows/Build/badge.svg)](https://github.com/elastic/go-elasticsearch/actions?query=branch%3A7.x)
-[![Unit](https://github.com/elastic/go-elasticsearch/workflows/Unit/badge.svg)](https://github.com/elastic/go-elasticsearch/actions?query=branch%3A7.x)
-[![Integration](https://github.com/elastic/go-elasticsearch/workflows/Integration/badge.svg)](https://github.com/elastic/go-elasticsearch/actions?query=branch%3A7.x)
-[![API](https://github.com/elastic/go-elasticsearch/workflows/API/badge.svg)](https://github.com/elastic/go-elasticsearch/actions?query=branch%3A7.x)
+[![codecov.io](https://codecov.io/github/elastic/go-elasticsearch/coverage.svg?branch=main)](https://codecov.io/gh/elastic/go-elasticsearch?branch=main)
+[![Build](https://github.com/elastic/go-elasticsearch/workflows/Build/badge.svg)](https://github.com/elastic/go-elasticsearch/actions?query=branch%3Amain)
+[![Unit](https://github.com/elastic/go-elasticsearch/workflows/Unit/badge.svg)](https://github.com/elastic/go-elasticsearch/actions?query=branch%3Amain)
+[![Integration](https://github.com/elastic/go-elasticsearch/workflows/Integration/badge.svg)](https://github.com/elastic/go-elasticsearch/actions?query=branch%3Amain)
+[![API](https://github.com/elastic/go-elasticsearch/workflows/API/badge.svg)](https://github.com/elastic/go-elasticsearch/actions?query=branch%3Amain)
 
 ## Compatibility
 
-The client major versions correspond to the compatible Elasticsearch major versions: to connect to Elasticsearch `7.x`, use a [`7.x`](https://github.com/elastic/go-elasticsearch/tree/7.x) version of the client, to connect to Elasticsearch `6.x`, use a [`6.x`](https://github.com/elastic/go-elasticsearch/tree/6.x) version of the client.
+Language clients are forward compatible; meaning that clients support communicating with greater or equal minor versions of Elasticsearch.
+Elasticsearch language clients are only backwards compatible with default distributions and without guarantees made.
 
 When using Go modules, include the version in the import path, and specify either an explicit version or a branch:
 
-    require github.com/elastic/go-elasticsearch/v7 7.x
+    require github.com/elastic/go-elasticsearch/v7 7.16
     require github.com/elastic/go-elasticsearch/v7 7.0.0
 
 It's possible to use multiple versions of the client in a single project:
 
     // go.mod
     github.com/elastic/go-elasticsearch/v6 6.x
-    github.com/elastic/go-elasticsearch/v7 7.x
+    github.com/elastic/go-elasticsearch/v7 7.16
 
     // main.go
     import (
@@ -34,7 +35,7 @@ It's possible to use multiple versions of the client in a single project:
     es6, _ := elasticsearch6.NewDefaultClient()
     es7, _ := elasticsearch7.NewDefaultClient()
 
-The `master` branch of the client is compatible with the current `master` branch of Elasticsearch.
+The `main` branch of the client is compatible with the current `master` branch of Elasticsearch.
 
 <!-- ----------------------------------------------------------------------------------------------- -->
 
@@ -42,11 +43,11 @@ The `master` branch of the client is compatible with the current `master` branch
 
 Add the package to your `go.mod` file:
 
-    require github.com/elastic/go-elasticsearch/v7 7.x
+    require github.com/elastic/go-elasticsearch/v8 main
 
 Or, clone the repository:
 
-    git clone --branch 7.x https://github.com/elastic/go-elasticsearch.git $GOPATH/src/github.com/elastic/go-elasticsearch
+    git clone --branch main https://github.com/elastic/go-elasticsearch.git $GOPATH/src/github.com/elastic/go-elasticsearch
 
 A complete example:
 
@@ -56,7 +57,7 @@ mkdir my-elasticsearch-app && cd my-elasticsearch-app
 cat > go.mod <<-END
   module my-elasticsearch-app
 
-  require github.com/elastic/go-elasticsearch/v7 7.x
+  require github.com/elastic/go-elasticsearch/v8 main
 END
 
 cat > main.go <<-END
@@ -158,7 +159,7 @@ cfg := elasticsearch.Config{
     MaxIdleConnsPerHost:   10,
     ResponseHeaderTimeout: time.Second,
     TLSClientConfig: &tls.Config{
-      MinVersion: tls.VersionTLS11,
+      MinVersion: tls.VersionTLS12,
       // ...
     },
     // ...
@@ -186,6 +187,7 @@ import (
   "strconv"
   "strings"
   "sync"
+  "bytes"
 
   "github.com/elastic/go-elasticsearch/v7"
   "github.com/elastic/go-elasticsearch/v7/esapi"
@@ -236,17 +238,17 @@ func main() {
     go func(i int, title string) {
       defer wg.Done()
 
-      // Build the request body.
-      var b strings.Builder
-      b.WriteString(`{"title" : "`)
-      b.WriteString(title)
-      b.WriteString(`"}`)
+      // Build the request body.      
+      data, err := json.Marshal(struct{ Title string }{Title: title})
+      if err != nil {
+        log.Fatalf("Error marshaling document: %s", err)
+      }
 
       // Set up the request object.
       req := esapi.IndexRequest{
         Index:      "test",
         DocumentID: strconv.Itoa(i + 1),
-        Body:       strings.NewReader(b.String()),
+        Body:       bytes.NewReader(data),
         Refresh:    "true",
       }
 
@@ -350,7 +352,13 @@ func main() {
 As you see in the example above, the `esapi` package allows to call the Elasticsearch APIs in two distinct ways: either by creating a struct, such as `IndexRequest`, and calling its `Do()` method by passing it a context and the client, or by calling the `Search()` function on the client directly, using the option functions such as `WithIndex()`. See more information and examples in the
 [package documentation](https://godoc.org/github.com/elastic/go-elasticsearch/esapi).
 
-The `estransport` package handles the transfer of data to and from Elasticsearch. At the moment, the implementation is really minimal: it only round-robins across the configured cluster endpoints. In future, more features — retrying failed requests, ignoring certain status codes, auto-discovering nodes in the cluster, and so on — will be added.
+The `estransport` package handles the transfer of data to and from Elasticsearch, including retrying failed requests, keeping a connection pool, discovering cluster nodes and logging.
+
+Read more about the client internals and usage in the following blog posts:
+
+* https://www.elastic.co/blog/the-go-client-for-elasticsearch-introduction
+* https://www.elastic.co/blog/the-go-client-for-elasticsearch-configuration-and-customization
+* https://www.elastic.co/blog/the-go-client-for-elasticsearch-working-with-data
 
 <!-- ----------------------------------------------------------------------------------------------- -->
 

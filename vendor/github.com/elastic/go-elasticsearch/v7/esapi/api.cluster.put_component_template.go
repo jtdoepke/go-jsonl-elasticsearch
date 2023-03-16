@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -29,14 +42,10 @@ func newClusterPutComponentTemplateFunc(t Transport) ClusterPutComponentTemplate
 
 // ClusterPutComponentTemplate creates or updates a component template
 //
-// This API is experimental.
-//
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-component-template.html.
-//
 type ClusterPutComponentTemplate func(name string, body io.Reader, o ...func(*ClusterPutComponentTemplateRequest)) (*Response, error)
 
 // ClusterPutComponentTemplateRequest configures the Cluster Put Component Template API request.
-//
 type ClusterPutComponentTemplateRequest struct {
 	Body io.Reader
 
@@ -57,7 +66,6 @@ type ClusterPutComponentTemplateRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r ClusterPutComponentTemplateRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -116,10 +124,6 @@ func (r ClusterPutComponentTemplateRequest) Do(ctx context.Context, transport Tr
 		req.URL.RawQuery = q.Encode()
 	}
 
-	if r.Body != nil {
-		req.Header[headerContentType] = headerContentTypeJSON
-	}
-
 	if len(r.Header) > 0 {
 		if len(req.Header) == 0 {
 			req.Header = r.Header
@@ -130,6 +134,10 @@ func (r ClusterPutComponentTemplateRequest) Do(ctx context.Context, transport Tr
 				}
 			}
 		}
+	}
+
+	if r.Body != nil && req.Header.Get(headerContentType) == "" {
+		req.Header[headerContentType] = headerContentTypeJSON
 	}
 
 	if ctx != nil {
@@ -151,7 +159,6 @@ func (r ClusterPutComponentTemplateRequest) Do(ctx context.Context, transport Tr
 }
 
 // WithContext sets the request context.
-//
 func (f ClusterPutComponentTemplate) WithContext(v context.Context) func(*ClusterPutComponentTemplateRequest) {
 	return func(r *ClusterPutComponentTemplateRequest) {
 		r.ctx = v
@@ -159,7 +166,6 @@ func (f ClusterPutComponentTemplate) WithContext(v context.Context) func(*Cluste
 }
 
 // WithCreate - whether the index template should only be added if new or can also replace an existing one.
-//
 func (f ClusterPutComponentTemplate) WithCreate(v bool) func(*ClusterPutComponentTemplateRequest) {
 	return func(r *ClusterPutComponentTemplateRequest) {
 		r.Create = &v
@@ -167,7 +173,6 @@ func (f ClusterPutComponentTemplate) WithCreate(v bool) func(*ClusterPutComponen
 }
 
 // WithMasterTimeout - specify timeout for connection to master.
-//
 func (f ClusterPutComponentTemplate) WithMasterTimeout(v time.Duration) func(*ClusterPutComponentTemplateRequest) {
 	return func(r *ClusterPutComponentTemplateRequest) {
 		r.MasterTimeout = v
@@ -175,7 +180,6 @@ func (f ClusterPutComponentTemplate) WithMasterTimeout(v time.Duration) func(*Cl
 }
 
 // WithTimeout - explicit operation timeout.
-//
 func (f ClusterPutComponentTemplate) WithTimeout(v time.Duration) func(*ClusterPutComponentTemplateRequest) {
 	return func(r *ClusterPutComponentTemplateRequest) {
 		r.Timeout = v
@@ -183,7 +187,6 @@ func (f ClusterPutComponentTemplate) WithTimeout(v time.Duration) func(*ClusterP
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f ClusterPutComponentTemplate) WithPretty() func(*ClusterPutComponentTemplateRequest) {
 	return func(r *ClusterPutComponentTemplateRequest) {
 		r.Pretty = true
@@ -191,7 +194,6 @@ func (f ClusterPutComponentTemplate) WithPretty() func(*ClusterPutComponentTempl
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f ClusterPutComponentTemplate) WithHuman() func(*ClusterPutComponentTemplateRequest) {
 	return func(r *ClusterPutComponentTemplateRequest) {
 		r.Human = true
@@ -199,7 +201,6 @@ func (f ClusterPutComponentTemplate) WithHuman() func(*ClusterPutComponentTempla
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f ClusterPutComponentTemplate) WithErrorTrace() func(*ClusterPutComponentTemplateRequest) {
 	return func(r *ClusterPutComponentTemplateRequest) {
 		r.ErrorTrace = true
@@ -207,7 +208,6 @@ func (f ClusterPutComponentTemplate) WithErrorTrace() func(*ClusterPutComponentT
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f ClusterPutComponentTemplate) WithFilterPath(v ...string) func(*ClusterPutComponentTemplateRequest) {
 	return func(r *ClusterPutComponentTemplateRequest) {
 		r.FilterPath = v
@@ -215,7 +215,6 @@ func (f ClusterPutComponentTemplate) WithFilterPath(v ...string) func(*ClusterPu
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f ClusterPutComponentTemplate) WithHeader(h map[string]string) func(*ClusterPutComponentTemplateRequest) {
 	return func(r *ClusterPutComponentTemplateRequest) {
 		if r.Header == nil {
@@ -228,7 +227,6 @@ func (f ClusterPutComponentTemplate) WithHeader(h map[string]string) func(*Clust
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f ClusterPutComponentTemplate) WithOpaqueID(s string) func(*ClusterPutComponentTemplateRequest) {
 	return func(r *ClusterPutComponentTemplateRequest) {
 		if r.Header == nil {

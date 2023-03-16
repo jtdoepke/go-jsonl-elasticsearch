@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -27,11 +40,9 @@ func newEnrichDeletePolicyFunc(t Transport) EnrichDeletePolicy {
 // EnrichDeletePolicy - Deletes an existing enrich policy and its enrich index.
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/delete-enrich-policy-api.html.
-//
 type EnrichDeletePolicy func(name string, o ...func(*EnrichDeletePolicyRequest)) (*Response, error)
 
 // EnrichDeletePolicyRequest configures the Enrich Delete Policy API request.
-//
 type EnrichDeletePolicyRequest struct {
 	Name string
 
@@ -46,7 +57,6 @@ type EnrichDeletePolicyRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r EnrichDeletePolicyRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -126,7 +136,6 @@ func (r EnrichDeletePolicyRequest) Do(ctx context.Context, transport Transport) 
 }
 
 // WithContext sets the request context.
-//
 func (f EnrichDeletePolicy) WithContext(v context.Context) func(*EnrichDeletePolicyRequest) {
 	return func(r *EnrichDeletePolicyRequest) {
 		r.ctx = v
@@ -134,7 +143,6 @@ func (f EnrichDeletePolicy) WithContext(v context.Context) func(*EnrichDeletePol
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f EnrichDeletePolicy) WithPretty() func(*EnrichDeletePolicyRequest) {
 	return func(r *EnrichDeletePolicyRequest) {
 		r.Pretty = true
@@ -142,7 +150,6 @@ func (f EnrichDeletePolicy) WithPretty() func(*EnrichDeletePolicyRequest) {
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f EnrichDeletePolicy) WithHuman() func(*EnrichDeletePolicyRequest) {
 	return func(r *EnrichDeletePolicyRequest) {
 		r.Human = true
@@ -150,7 +157,6 @@ func (f EnrichDeletePolicy) WithHuman() func(*EnrichDeletePolicyRequest) {
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f EnrichDeletePolicy) WithErrorTrace() func(*EnrichDeletePolicyRequest) {
 	return func(r *EnrichDeletePolicyRequest) {
 		r.ErrorTrace = true
@@ -158,7 +164,6 @@ func (f EnrichDeletePolicy) WithErrorTrace() func(*EnrichDeletePolicyRequest) {
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f EnrichDeletePolicy) WithFilterPath(v ...string) func(*EnrichDeletePolicyRequest) {
 	return func(r *EnrichDeletePolicyRequest) {
 		r.FilterPath = v
@@ -166,7 +171,6 @@ func (f EnrichDeletePolicy) WithFilterPath(v ...string) func(*EnrichDeletePolicy
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f EnrichDeletePolicy) WithHeader(h map[string]string) func(*EnrichDeletePolicyRequest) {
 	return func(r *EnrichDeletePolicyRequest) {
 		if r.Header == nil {
@@ -179,7 +183,6 @@ func (f EnrichDeletePolicy) WithHeader(h map[string]string) func(*EnrichDeletePo
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f EnrichDeletePolicy) WithOpaqueID(s string) func(*EnrichDeletePolicyRequest) {
 	return func(r *EnrichDeletePolicyRequest) {
 		if r.Header == nil {

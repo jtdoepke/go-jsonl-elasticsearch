@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -27,11 +40,9 @@ func newCCRResumeAutoFollowPatternFunc(t Transport) CCRResumeAutoFollowPattern {
 // CCRResumeAutoFollowPattern - Resumes an auto-follow pattern that has been paused
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/ccr-resume-auto-follow-pattern.html.
-//
 type CCRResumeAutoFollowPattern func(name string, o ...func(*CCRResumeAutoFollowPatternRequest)) (*Response, error)
 
 // CCRResumeAutoFollowPatternRequest configures the CCR Resume Auto Follow Pattern API request.
-//
 type CCRResumeAutoFollowPatternRequest struct {
 	Name string
 
@@ -46,7 +57,6 @@ type CCRResumeAutoFollowPatternRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r CCRResumeAutoFollowPatternRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -128,7 +138,6 @@ func (r CCRResumeAutoFollowPatternRequest) Do(ctx context.Context, transport Tra
 }
 
 // WithContext sets the request context.
-//
 func (f CCRResumeAutoFollowPattern) WithContext(v context.Context) func(*CCRResumeAutoFollowPatternRequest) {
 	return func(r *CCRResumeAutoFollowPatternRequest) {
 		r.ctx = v
@@ -136,7 +145,6 @@ func (f CCRResumeAutoFollowPattern) WithContext(v context.Context) func(*CCRResu
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f CCRResumeAutoFollowPattern) WithPretty() func(*CCRResumeAutoFollowPatternRequest) {
 	return func(r *CCRResumeAutoFollowPatternRequest) {
 		r.Pretty = true
@@ -144,7 +152,6 @@ func (f CCRResumeAutoFollowPattern) WithPretty() func(*CCRResumeAutoFollowPatter
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f CCRResumeAutoFollowPattern) WithHuman() func(*CCRResumeAutoFollowPatternRequest) {
 	return func(r *CCRResumeAutoFollowPatternRequest) {
 		r.Human = true
@@ -152,7 +159,6 @@ func (f CCRResumeAutoFollowPattern) WithHuman() func(*CCRResumeAutoFollowPattern
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f CCRResumeAutoFollowPattern) WithErrorTrace() func(*CCRResumeAutoFollowPatternRequest) {
 	return func(r *CCRResumeAutoFollowPatternRequest) {
 		r.ErrorTrace = true
@@ -160,7 +166,6 @@ func (f CCRResumeAutoFollowPattern) WithErrorTrace() func(*CCRResumeAutoFollowPa
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f CCRResumeAutoFollowPattern) WithFilterPath(v ...string) func(*CCRResumeAutoFollowPatternRequest) {
 	return func(r *CCRResumeAutoFollowPatternRequest) {
 		r.FilterPath = v
@@ -168,7 +173,6 @@ func (f CCRResumeAutoFollowPattern) WithFilterPath(v ...string) func(*CCRResumeA
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f CCRResumeAutoFollowPattern) WithHeader(h map[string]string) func(*CCRResumeAutoFollowPatternRequest) {
 	return func(r *CCRResumeAutoFollowPatternRequest) {
 		if r.Header == nil {
@@ -181,7 +185,6 @@ func (f CCRResumeAutoFollowPattern) WithHeader(h map[string]string) func(*CCRRes
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f CCRResumeAutoFollowPattern) WithOpaqueID(s string) func(*CCRResumeAutoFollowPatternRequest) {
 	return func(r *CCRResumeAutoFollowPatternRequest) {
 		if r.Header == nil {

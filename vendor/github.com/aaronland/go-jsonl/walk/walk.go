@@ -1,21 +1,28 @@
+// package walk provides methods for walking all in the records in a line-delimited JSON document.
 package walk
 
 import (
+	"context"
 	"fmt"
 	"github.com/aaronland/go-json-query"
+	"io"
 )
 
 const CONTEXT_PATH string = "github.com/aaronland/go-jsonl#path"
+
+type WalkFilterFunc func(context.Context, string) bool
 
 type WalkOptions struct {
 	URI           string
 	Workers       int
 	RecordChannel chan *WalkRecord
 	ErrorChannel  chan *WalkError
+	DoneChannel   chan bool
 	ValidateJSON  bool
 	FormatJSON    bool
 	QuerySet      *query.QuerySet
 	IsBzip        bool
+	Filter        WalkFilterFunc
 }
 
 type WalkRecord struct {
@@ -36,4 +43,19 @@ func (e *WalkError) Error() string {
 
 func (e *WalkError) String() string {
 	return fmt.Sprintf("[%s] line %d, %v", e.Path, e.LineNumber, e.Err)
+}
+
+func IsEOFError(err error) bool {
+
+	switch err.(type) {
+	case *WalkError:
+
+		if err.(*WalkError).Err == io.EOF {
+			return true
+		}
+
+		return false
+	default:
+		return false
+	}
 }

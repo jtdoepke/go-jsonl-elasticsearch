@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -27,11 +40,9 @@ func newMLPutCalendarJobFunc(t Transport) MLPutCalendarJob {
 // MLPutCalendarJob - Adds an anomaly detection job to a calendar.
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/ml-put-calendar-job.html.
-//
 type MLPutCalendarJob func(calendar_id string, job_id string, o ...func(*MLPutCalendarJobRequest)) (*Response, error)
 
 // MLPutCalendarJobRequest configures the ML Put Calendar Job API request.
-//
 type MLPutCalendarJobRequest struct {
 	CalendarID string
 	JobID      string
@@ -47,7 +58,6 @@ type MLPutCalendarJobRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r MLPutCalendarJobRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -131,7 +141,6 @@ func (r MLPutCalendarJobRequest) Do(ctx context.Context, transport Transport) (*
 }
 
 // WithContext sets the request context.
-//
 func (f MLPutCalendarJob) WithContext(v context.Context) func(*MLPutCalendarJobRequest) {
 	return func(r *MLPutCalendarJobRequest) {
 		r.ctx = v
@@ -139,7 +148,6 @@ func (f MLPutCalendarJob) WithContext(v context.Context) func(*MLPutCalendarJobR
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f MLPutCalendarJob) WithPretty() func(*MLPutCalendarJobRequest) {
 	return func(r *MLPutCalendarJobRequest) {
 		r.Pretty = true
@@ -147,7 +155,6 @@ func (f MLPutCalendarJob) WithPretty() func(*MLPutCalendarJobRequest) {
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f MLPutCalendarJob) WithHuman() func(*MLPutCalendarJobRequest) {
 	return func(r *MLPutCalendarJobRequest) {
 		r.Human = true
@@ -155,7 +162,6 @@ func (f MLPutCalendarJob) WithHuman() func(*MLPutCalendarJobRequest) {
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f MLPutCalendarJob) WithErrorTrace() func(*MLPutCalendarJobRequest) {
 	return func(r *MLPutCalendarJobRequest) {
 		r.ErrorTrace = true
@@ -163,7 +169,6 @@ func (f MLPutCalendarJob) WithErrorTrace() func(*MLPutCalendarJobRequest) {
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f MLPutCalendarJob) WithFilterPath(v ...string) func(*MLPutCalendarJobRequest) {
 	return func(r *MLPutCalendarJobRequest) {
 		r.FilterPath = v
@@ -171,7 +176,6 @@ func (f MLPutCalendarJob) WithFilterPath(v ...string) func(*MLPutCalendarJobRequ
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f MLPutCalendarJob) WithHeader(h map[string]string) func(*MLPutCalendarJobRequest) {
 	return func(r *MLPutCalendarJobRequest) {
 		if r.Header == nil {
@@ -184,7 +188,6 @@ func (f MLPutCalendarJob) WithHeader(h map[string]string) func(*MLPutCalendarJob
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f MLPutCalendarJob) WithOpaqueID(s string) func(*MLPutCalendarJobRequest) {
 	return func(r *MLPutCalendarJobRequest) {
 		if r.Header == nil {

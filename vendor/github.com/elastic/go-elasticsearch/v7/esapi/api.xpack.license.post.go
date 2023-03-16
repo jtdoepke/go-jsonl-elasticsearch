@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -29,11 +42,9 @@ func newLicensePostFunc(t Transport) LicensePost {
 // LicensePost - Updates the license for the cluster.
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/master/update-license.html.
-//
 type LicensePost func(o ...func(*LicensePostRequest)) (*Response, error)
 
 // LicensePostRequest configures the License Post API request.
-//
 type LicensePostRequest struct {
 	Body io.Reader
 
@@ -50,7 +61,6 @@ type LicensePostRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r LicensePostRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -98,10 +108,6 @@ func (r LicensePostRequest) Do(ctx context.Context, transport Transport) (*Respo
 		req.URL.RawQuery = q.Encode()
 	}
 
-	if r.Body != nil {
-		req.Header[headerContentType] = headerContentTypeJSON
-	}
-
 	if len(r.Header) > 0 {
 		if len(req.Header) == 0 {
 			req.Header = r.Header
@@ -112,6 +118,10 @@ func (r LicensePostRequest) Do(ctx context.Context, transport Transport) (*Respo
 				}
 			}
 		}
+	}
+
+	if r.Body != nil && req.Header.Get(headerContentType) == "" {
+		req.Header[headerContentType] = headerContentTypeJSON
 	}
 
 	if ctx != nil {
@@ -133,7 +143,6 @@ func (r LicensePostRequest) Do(ctx context.Context, transport Transport) (*Respo
 }
 
 // WithContext sets the request context.
-//
 func (f LicensePost) WithContext(v context.Context) func(*LicensePostRequest) {
 	return func(r *LicensePostRequest) {
 		r.ctx = v
@@ -141,7 +150,6 @@ func (f LicensePost) WithContext(v context.Context) func(*LicensePostRequest) {
 }
 
 // WithBody - licenses to be installed.
-//
 func (f LicensePost) WithBody(v io.Reader) func(*LicensePostRequest) {
 	return func(r *LicensePostRequest) {
 		r.Body = v
@@ -149,7 +157,6 @@ func (f LicensePost) WithBody(v io.Reader) func(*LicensePostRequest) {
 }
 
 // WithAcknowledge - whether the user has acknowledged acknowledge messages (default: false).
-//
 func (f LicensePost) WithAcknowledge(v bool) func(*LicensePostRequest) {
 	return func(r *LicensePostRequest) {
 		r.Acknowledge = &v
@@ -157,7 +164,6 @@ func (f LicensePost) WithAcknowledge(v bool) func(*LicensePostRequest) {
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f LicensePost) WithPretty() func(*LicensePostRequest) {
 	return func(r *LicensePostRequest) {
 		r.Pretty = true
@@ -165,7 +171,6 @@ func (f LicensePost) WithPretty() func(*LicensePostRequest) {
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f LicensePost) WithHuman() func(*LicensePostRequest) {
 	return func(r *LicensePostRequest) {
 		r.Human = true
@@ -173,7 +178,6 @@ func (f LicensePost) WithHuman() func(*LicensePostRequest) {
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f LicensePost) WithErrorTrace() func(*LicensePostRequest) {
 	return func(r *LicensePostRequest) {
 		r.ErrorTrace = true
@@ -181,7 +185,6 @@ func (f LicensePost) WithErrorTrace() func(*LicensePostRequest) {
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f LicensePost) WithFilterPath(v ...string) func(*LicensePostRequest) {
 	return func(r *LicensePostRequest) {
 		r.FilterPath = v
@@ -189,7 +192,6 @@ func (f LicensePost) WithFilterPath(v ...string) func(*LicensePostRequest) {
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f LicensePost) WithHeader(h map[string]string) func(*LicensePostRequest) {
 	return func(r *LicensePostRequest) {
 		if r.Header == nil {
@@ -202,7 +204,6 @@ func (f LicensePost) WithHeader(h map[string]string) func(*LicensePostRequest) {
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f LicensePost) WithOpaqueID(s string) func(*LicensePostRequest) {
 	return func(r *LicensePostRequest) {
 		if r.Header == nil {

@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -30,11 +43,9 @@ func newAsyncSearchSubmitFunc(t Transport) AsyncSearchSubmit {
 // AsyncSearchSubmit - Executes a search request asynchronously.
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/async-search.html.
-//
 type AsyncSearchSubmit func(o ...func(*AsyncSearchSubmitRequest)) (*Response, error)
 
 // AsyncSearchSubmitRequest configures the Async Search Submit API request.
-//
 type AsyncSearchSubmitRequest struct {
 	Index []string
 
@@ -93,7 +104,6 @@ type AsyncSearchSubmitRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r AsyncSearchSubmitRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -306,10 +316,6 @@ func (r AsyncSearchSubmitRequest) Do(ctx context.Context, transport Transport) (
 		req.URL.RawQuery = q.Encode()
 	}
 
-	if r.Body != nil {
-		req.Header[headerContentType] = headerContentTypeJSON
-	}
-
 	if len(r.Header) > 0 {
 		if len(req.Header) == 0 {
 			req.Header = r.Header
@@ -320,6 +326,10 @@ func (r AsyncSearchSubmitRequest) Do(ctx context.Context, transport Transport) (
 				}
 			}
 		}
+	}
+
+	if r.Body != nil && req.Header.Get(headerContentType) == "" {
+		req.Header[headerContentType] = headerContentTypeJSON
 	}
 
 	if ctx != nil {
@@ -341,7 +351,6 @@ func (r AsyncSearchSubmitRequest) Do(ctx context.Context, transport Transport) (
 }
 
 // WithContext sets the request context.
-//
 func (f AsyncSearchSubmit) WithContext(v context.Context) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.ctx = v
@@ -349,7 +358,6 @@ func (f AsyncSearchSubmit) WithContext(v context.Context) func(*AsyncSearchSubmi
 }
 
 // WithBody - The search definition using the Query DSL.
-//
 func (f AsyncSearchSubmit) WithBody(v io.Reader) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Body = v
@@ -357,7 +365,6 @@ func (f AsyncSearchSubmit) WithBody(v io.Reader) func(*AsyncSearchSubmitRequest)
 }
 
 // WithIndex - a list of index names to search; use _all to perform the operation on all indices.
-//
 func (f AsyncSearchSubmit) WithIndex(v ...string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Index = v
@@ -365,7 +372,6 @@ func (f AsyncSearchSubmit) WithIndex(v ...string) func(*AsyncSearchSubmitRequest
 }
 
 // WithAllowNoIndices - whether to ignore if a wildcard indices expression resolves into no concrete indices. (this includes `_all` string or when no indices have been specified).
-//
 func (f AsyncSearchSubmit) WithAllowNoIndices(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.AllowNoIndices = &v
@@ -373,7 +379,6 @@ func (f AsyncSearchSubmit) WithAllowNoIndices(v bool) func(*AsyncSearchSubmitReq
 }
 
 // WithAllowPartialSearchResults - indicate if an error should be returned if there is a partial search failure or timeout.
-//
 func (f AsyncSearchSubmit) WithAllowPartialSearchResults(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.AllowPartialSearchResults = &v
@@ -381,7 +386,6 @@ func (f AsyncSearchSubmit) WithAllowPartialSearchResults(v bool) func(*AsyncSear
 }
 
 // WithAnalyzer - the analyzer to use for the query string.
-//
 func (f AsyncSearchSubmit) WithAnalyzer(v string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Analyzer = v
@@ -389,7 +393,6 @@ func (f AsyncSearchSubmit) WithAnalyzer(v string) func(*AsyncSearchSubmitRequest
 }
 
 // WithAnalyzeWildcard - specify whether wildcard and prefix queries should be analyzed (default: false).
-//
 func (f AsyncSearchSubmit) WithAnalyzeWildcard(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.AnalyzeWildcard = &v
@@ -397,7 +400,6 @@ func (f AsyncSearchSubmit) WithAnalyzeWildcard(v bool) func(*AsyncSearchSubmitRe
 }
 
 // WithBatchedReduceSize - the number of shard results that should be reduced at once on the coordinating node. this value should be used as the granularity at which progress results will be made available..
-//
 func (f AsyncSearchSubmit) WithBatchedReduceSize(v int) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.BatchedReduceSize = &v
@@ -405,7 +407,6 @@ func (f AsyncSearchSubmit) WithBatchedReduceSize(v int) func(*AsyncSearchSubmitR
 }
 
 // WithDefaultOperator - the default operator for query string query (and or or).
-//
 func (f AsyncSearchSubmit) WithDefaultOperator(v string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.DefaultOperator = v
@@ -413,7 +414,6 @@ func (f AsyncSearchSubmit) WithDefaultOperator(v string) func(*AsyncSearchSubmit
 }
 
 // WithDf - the field to use as default where no field prefix is given in the query string.
-//
 func (f AsyncSearchSubmit) WithDf(v string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Df = v
@@ -421,7 +421,6 @@ func (f AsyncSearchSubmit) WithDf(v string) func(*AsyncSearchSubmitRequest) {
 }
 
 // WithDocvalueFields - a list of fields to return as the docvalue representation of a field for each hit.
-//
 func (f AsyncSearchSubmit) WithDocvalueFields(v ...string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.DocvalueFields = v
@@ -429,7 +428,6 @@ func (f AsyncSearchSubmit) WithDocvalueFields(v ...string) func(*AsyncSearchSubm
 }
 
 // WithExpandWildcards - whether to expand wildcard expression to concrete indices that are open, closed or both..
-//
 func (f AsyncSearchSubmit) WithExpandWildcards(v string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.ExpandWildcards = v
@@ -437,7 +435,6 @@ func (f AsyncSearchSubmit) WithExpandWildcards(v string) func(*AsyncSearchSubmit
 }
 
 // WithExplain - specify whether to return detailed information about score computation as part of a hit.
-//
 func (f AsyncSearchSubmit) WithExplain(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Explain = &v
@@ -445,7 +442,6 @@ func (f AsyncSearchSubmit) WithExplain(v bool) func(*AsyncSearchSubmitRequest) {
 }
 
 // WithFrom - starting offset (default: 0).
-//
 func (f AsyncSearchSubmit) WithFrom(v int) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.From = &v
@@ -453,7 +449,6 @@ func (f AsyncSearchSubmit) WithFrom(v int) func(*AsyncSearchSubmitRequest) {
 }
 
 // WithIgnoreThrottled - whether specified concrete, expanded or aliased indices should be ignored when throttled.
-//
 func (f AsyncSearchSubmit) WithIgnoreThrottled(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.IgnoreThrottled = &v
@@ -461,7 +456,6 @@ func (f AsyncSearchSubmit) WithIgnoreThrottled(v bool) func(*AsyncSearchSubmitRe
 }
 
 // WithIgnoreUnavailable - whether specified concrete indices should be ignored when unavailable (missing or closed).
-//
 func (f AsyncSearchSubmit) WithIgnoreUnavailable(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.IgnoreUnavailable = &v
@@ -469,7 +463,6 @@ func (f AsyncSearchSubmit) WithIgnoreUnavailable(v bool) func(*AsyncSearchSubmit
 }
 
 // WithKeepAlive - update the time interval in which the results (partial or final) for this search will be available.
-//
 func (f AsyncSearchSubmit) WithKeepAlive(v time.Duration) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.KeepAlive = v
@@ -477,7 +470,6 @@ func (f AsyncSearchSubmit) WithKeepAlive(v time.Duration) func(*AsyncSearchSubmi
 }
 
 // WithKeepOnCompletion - control whether the response should be stored in the cluster if it completed within the provided [wait_for_completion] time (default: false).
-//
 func (f AsyncSearchSubmit) WithKeepOnCompletion(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.KeepOnCompletion = &v
@@ -485,7 +477,6 @@ func (f AsyncSearchSubmit) WithKeepOnCompletion(v bool) func(*AsyncSearchSubmitR
 }
 
 // WithLenient - specify whether format-based query failures (such as providing text to a numeric field) should be ignored.
-//
 func (f AsyncSearchSubmit) WithLenient(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Lenient = &v
@@ -493,7 +484,6 @@ func (f AsyncSearchSubmit) WithLenient(v bool) func(*AsyncSearchSubmitRequest) {
 }
 
 // WithMaxConcurrentShardRequests - the number of concurrent shard requests per node this search executes concurrently. this value should be used to limit the impact of the search on the cluster in order to limit the number of concurrent shard requests.
-//
 func (f AsyncSearchSubmit) WithMaxConcurrentShardRequests(v int) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.MaxConcurrentShardRequests = &v
@@ -501,7 +491,6 @@ func (f AsyncSearchSubmit) WithMaxConcurrentShardRequests(v int) func(*AsyncSear
 }
 
 // WithPreference - specify the node or shard the operation should be performed on (default: random).
-//
 func (f AsyncSearchSubmit) WithPreference(v string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Preference = v
@@ -509,7 +498,6 @@ func (f AsyncSearchSubmit) WithPreference(v string) func(*AsyncSearchSubmitReque
 }
 
 // WithQuery - query in the lucene query string syntax.
-//
 func (f AsyncSearchSubmit) WithQuery(v string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Query = v
@@ -517,7 +505,6 @@ func (f AsyncSearchSubmit) WithQuery(v string) func(*AsyncSearchSubmitRequest) {
 }
 
 // WithRequestCache - specify if request cache should be used for this request or not, defaults to true.
-//
 func (f AsyncSearchSubmit) WithRequestCache(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.RequestCache = &v
@@ -525,7 +512,6 @@ func (f AsyncSearchSubmit) WithRequestCache(v bool) func(*AsyncSearchSubmitReque
 }
 
 // WithRouting - a list of specific routing values.
-//
 func (f AsyncSearchSubmit) WithRouting(v ...string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Routing = v
@@ -533,7 +519,6 @@ func (f AsyncSearchSubmit) WithRouting(v ...string) func(*AsyncSearchSubmitReque
 }
 
 // WithSearchType - search operation type.
-//
 func (f AsyncSearchSubmit) WithSearchType(v string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.SearchType = v
@@ -541,7 +526,6 @@ func (f AsyncSearchSubmit) WithSearchType(v string) func(*AsyncSearchSubmitReque
 }
 
 // WithSeqNoPrimaryTerm - specify whether to return sequence number and primary term of the last modification of each hit.
-//
 func (f AsyncSearchSubmit) WithSeqNoPrimaryTerm(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.SeqNoPrimaryTerm = &v
@@ -549,7 +533,6 @@ func (f AsyncSearchSubmit) WithSeqNoPrimaryTerm(v bool) func(*AsyncSearchSubmitR
 }
 
 // WithSize - number of hits to return (default: 10).
-//
 func (f AsyncSearchSubmit) WithSize(v int) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Size = &v
@@ -557,7 +540,6 @@ func (f AsyncSearchSubmit) WithSize(v int) func(*AsyncSearchSubmitRequest) {
 }
 
 // WithSort - a list of <field>:<direction> pairs.
-//
 func (f AsyncSearchSubmit) WithSort(v ...string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Sort = v
@@ -565,7 +547,6 @@ func (f AsyncSearchSubmit) WithSort(v ...string) func(*AsyncSearchSubmitRequest)
 }
 
 // WithSource - true or false to return the _source field or not, or a list of fields to return.
-//
 func (f AsyncSearchSubmit) WithSource(v ...string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Source = v
@@ -573,7 +554,6 @@ func (f AsyncSearchSubmit) WithSource(v ...string) func(*AsyncSearchSubmitReques
 }
 
 // WithSourceExcludes - a list of fields to exclude from the returned _source field.
-//
 func (f AsyncSearchSubmit) WithSourceExcludes(v ...string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.SourceExcludes = v
@@ -581,7 +561,6 @@ func (f AsyncSearchSubmit) WithSourceExcludes(v ...string) func(*AsyncSearchSubm
 }
 
 // WithSourceIncludes - a list of fields to extract and return from the _source field.
-//
 func (f AsyncSearchSubmit) WithSourceIncludes(v ...string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.SourceIncludes = v
@@ -589,7 +568,6 @@ func (f AsyncSearchSubmit) WithSourceIncludes(v ...string) func(*AsyncSearchSubm
 }
 
 // WithStats - specific 'tag' of the request for logging and statistical purposes.
-//
 func (f AsyncSearchSubmit) WithStats(v ...string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Stats = v
@@ -597,7 +575,6 @@ func (f AsyncSearchSubmit) WithStats(v ...string) func(*AsyncSearchSubmitRequest
 }
 
 // WithStoredFields - a list of stored fields to return as part of a hit.
-//
 func (f AsyncSearchSubmit) WithStoredFields(v ...string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.StoredFields = v
@@ -605,7 +582,6 @@ func (f AsyncSearchSubmit) WithStoredFields(v ...string) func(*AsyncSearchSubmit
 }
 
 // WithSuggestField - specify which field to use for suggestions.
-//
 func (f AsyncSearchSubmit) WithSuggestField(v string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.SuggestField = v
@@ -613,7 +589,6 @@ func (f AsyncSearchSubmit) WithSuggestField(v string) func(*AsyncSearchSubmitReq
 }
 
 // WithSuggestMode - specify suggest mode.
-//
 func (f AsyncSearchSubmit) WithSuggestMode(v string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.SuggestMode = v
@@ -621,7 +596,6 @@ func (f AsyncSearchSubmit) WithSuggestMode(v string) func(*AsyncSearchSubmitRequ
 }
 
 // WithSuggestSize - how many suggestions to return in response.
-//
 func (f AsyncSearchSubmit) WithSuggestSize(v int) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.SuggestSize = &v
@@ -629,7 +603,6 @@ func (f AsyncSearchSubmit) WithSuggestSize(v int) func(*AsyncSearchSubmitRequest
 }
 
 // WithSuggestText - the source text for which the suggestions should be returned.
-//
 func (f AsyncSearchSubmit) WithSuggestText(v string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.SuggestText = v
@@ -637,7 +610,6 @@ func (f AsyncSearchSubmit) WithSuggestText(v string) func(*AsyncSearchSubmitRequ
 }
 
 // WithTerminateAfter - the maximum number of documents to collect for each shard, upon reaching which the query execution will terminate early..
-//
 func (f AsyncSearchSubmit) WithTerminateAfter(v int) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.TerminateAfter = &v
@@ -645,7 +617,6 @@ func (f AsyncSearchSubmit) WithTerminateAfter(v int) func(*AsyncSearchSubmitRequ
 }
 
 // WithTimeout - explicit operation timeout.
-//
 func (f AsyncSearchSubmit) WithTimeout(v time.Duration) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Timeout = v
@@ -653,7 +624,6 @@ func (f AsyncSearchSubmit) WithTimeout(v time.Duration) func(*AsyncSearchSubmitR
 }
 
 // WithTrackScores - whether to calculate and return scores even if they are not used for sorting.
-//
 func (f AsyncSearchSubmit) WithTrackScores(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.TrackScores = &v
@@ -661,7 +631,6 @@ func (f AsyncSearchSubmit) WithTrackScores(v bool) func(*AsyncSearchSubmitReques
 }
 
 // WithTrackTotalHits - indicate if the number of documents that match the query should be tracked.
-//
 func (f AsyncSearchSubmit) WithTrackTotalHits(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.TrackTotalHits = &v
@@ -669,7 +638,6 @@ func (f AsyncSearchSubmit) WithTrackTotalHits(v bool) func(*AsyncSearchSubmitReq
 }
 
 // WithTypedKeys - specify whether aggregation and suggester names should be prefixed by their respective types in the response.
-//
 func (f AsyncSearchSubmit) WithTypedKeys(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.TypedKeys = &v
@@ -677,7 +645,6 @@ func (f AsyncSearchSubmit) WithTypedKeys(v bool) func(*AsyncSearchSubmitRequest)
 }
 
 // WithVersion - specify whether to return document version as part of a hit.
-//
 func (f AsyncSearchSubmit) WithVersion(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Version = &v
@@ -685,7 +652,6 @@ func (f AsyncSearchSubmit) WithVersion(v bool) func(*AsyncSearchSubmitRequest) {
 }
 
 // WithWaitForCompletionTimeout - specify the time that the request should block waiting for the final response.
-//
 func (f AsyncSearchSubmit) WithWaitForCompletionTimeout(v time.Duration) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.WaitForCompletionTimeout = v
@@ -693,7 +659,6 @@ func (f AsyncSearchSubmit) WithWaitForCompletionTimeout(v time.Duration) func(*A
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f AsyncSearchSubmit) WithPretty() func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Pretty = true
@@ -701,7 +666,6 @@ func (f AsyncSearchSubmit) WithPretty() func(*AsyncSearchSubmitRequest) {
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f AsyncSearchSubmit) WithHuman() func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.Human = true
@@ -709,7 +673,6 @@ func (f AsyncSearchSubmit) WithHuman() func(*AsyncSearchSubmitRequest) {
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f AsyncSearchSubmit) WithErrorTrace() func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.ErrorTrace = true
@@ -717,7 +680,6 @@ func (f AsyncSearchSubmit) WithErrorTrace() func(*AsyncSearchSubmitRequest) {
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f AsyncSearchSubmit) WithFilterPath(v ...string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.FilterPath = v
@@ -725,7 +687,6 @@ func (f AsyncSearchSubmit) WithFilterPath(v ...string) func(*AsyncSearchSubmitRe
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f AsyncSearchSubmit) WithHeader(h map[string]string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		if r.Header == nil {
@@ -738,7 +699,6 @@ func (f AsyncSearchSubmit) WithHeader(h map[string]string) func(*AsyncSearchSubm
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f AsyncSearchSubmit) WithOpaqueID(s string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		if r.Header == nil {

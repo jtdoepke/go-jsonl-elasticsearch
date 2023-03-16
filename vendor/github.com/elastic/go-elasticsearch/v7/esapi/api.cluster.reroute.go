@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -30,11 +43,9 @@ func newClusterRerouteFunc(t Transport) ClusterReroute {
 // ClusterReroute allows to manually change the allocation of individual shards in the cluster.
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/master/cluster-reroute.html.
-//
 type ClusterReroute func(o ...func(*ClusterRerouteRequest)) (*Response, error)
 
 // ClusterRerouteRequest configures the Cluster Reroute API request.
-//
 type ClusterRerouteRequest struct {
 	Body io.Reader
 
@@ -56,7 +67,6 @@ type ClusterRerouteRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r ClusterRerouteRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -124,10 +134,6 @@ func (r ClusterRerouteRequest) Do(ctx context.Context, transport Transport) (*Re
 		req.URL.RawQuery = q.Encode()
 	}
 
-	if r.Body != nil {
-		req.Header[headerContentType] = headerContentTypeJSON
-	}
-
 	if len(r.Header) > 0 {
 		if len(req.Header) == 0 {
 			req.Header = r.Header
@@ -138,6 +144,10 @@ func (r ClusterRerouteRequest) Do(ctx context.Context, transport Transport) (*Re
 				}
 			}
 		}
+	}
+
+	if r.Body != nil && req.Header.Get(headerContentType) == "" {
+		req.Header[headerContentType] = headerContentTypeJSON
 	}
 
 	if ctx != nil {
@@ -159,7 +169,6 @@ func (r ClusterRerouteRequest) Do(ctx context.Context, transport Transport) (*Re
 }
 
 // WithContext sets the request context.
-//
 func (f ClusterReroute) WithContext(v context.Context) func(*ClusterRerouteRequest) {
 	return func(r *ClusterRerouteRequest) {
 		r.ctx = v
@@ -167,7 +176,6 @@ func (f ClusterReroute) WithContext(v context.Context) func(*ClusterRerouteReque
 }
 
 // WithBody - The definition of `commands` to perform (`move`, `cancel`, `allocate`).
-//
 func (f ClusterReroute) WithBody(v io.Reader) func(*ClusterRerouteRequest) {
 	return func(r *ClusterRerouteRequest) {
 		r.Body = v
@@ -175,7 +183,6 @@ func (f ClusterReroute) WithBody(v io.Reader) func(*ClusterRerouteRequest) {
 }
 
 // WithDryRun - simulate the operation only and return the resulting state.
-//
 func (f ClusterReroute) WithDryRun(v bool) func(*ClusterRerouteRequest) {
 	return func(r *ClusterRerouteRequest) {
 		r.DryRun = &v
@@ -183,7 +190,6 @@ func (f ClusterReroute) WithDryRun(v bool) func(*ClusterRerouteRequest) {
 }
 
 // WithExplain - return an explanation of why the commands can or cannot be executed.
-//
 func (f ClusterReroute) WithExplain(v bool) func(*ClusterRerouteRequest) {
 	return func(r *ClusterRerouteRequest) {
 		r.Explain = &v
@@ -191,7 +197,6 @@ func (f ClusterReroute) WithExplain(v bool) func(*ClusterRerouteRequest) {
 }
 
 // WithMasterTimeout - explicit operation timeout for connection to master node.
-//
 func (f ClusterReroute) WithMasterTimeout(v time.Duration) func(*ClusterRerouteRequest) {
 	return func(r *ClusterRerouteRequest) {
 		r.MasterTimeout = v
@@ -199,7 +204,6 @@ func (f ClusterReroute) WithMasterTimeout(v time.Duration) func(*ClusterRerouteR
 }
 
 // WithMetric - limit the information returned to the specified metrics. defaults to all but metadata.
-//
 func (f ClusterReroute) WithMetric(v ...string) func(*ClusterRerouteRequest) {
 	return func(r *ClusterRerouteRequest) {
 		r.Metric = v
@@ -207,7 +211,6 @@ func (f ClusterReroute) WithMetric(v ...string) func(*ClusterRerouteRequest) {
 }
 
 // WithRetryFailed - retries allocation of shards that are blocked due to too many subsequent allocation failures.
-//
 func (f ClusterReroute) WithRetryFailed(v bool) func(*ClusterRerouteRequest) {
 	return func(r *ClusterRerouteRequest) {
 		r.RetryFailed = &v
@@ -215,7 +218,6 @@ func (f ClusterReroute) WithRetryFailed(v bool) func(*ClusterRerouteRequest) {
 }
 
 // WithTimeout - explicit operation timeout.
-//
 func (f ClusterReroute) WithTimeout(v time.Duration) func(*ClusterRerouteRequest) {
 	return func(r *ClusterRerouteRequest) {
 		r.Timeout = v
@@ -223,7 +225,6 @@ func (f ClusterReroute) WithTimeout(v time.Duration) func(*ClusterRerouteRequest
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f ClusterReroute) WithPretty() func(*ClusterRerouteRequest) {
 	return func(r *ClusterRerouteRequest) {
 		r.Pretty = true
@@ -231,7 +232,6 @@ func (f ClusterReroute) WithPretty() func(*ClusterRerouteRequest) {
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f ClusterReroute) WithHuman() func(*ClusterRerouteRequest) {
 	return func(r *ClusterRerouteRequest) {
 		r.Human = true
@@ -239,7 +239,6 @@ func (f ClusterReroute) WithHuman() func(*ClusterRerouteRequest) {
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f ClusterReroute) WithErrorTrace() func(*ClusterRerouteRequest) {
 	return func(r *ClusterRerouteRequest) {
 		r.ErrorTrace = true
@@ -247,7 +246,6 @@ func (f ClusterReroute) WithErrorTrace() func(*ClusterRerouteRequest) {
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f ClusterReroute) WithFilterPath(v ...string) func(*ClusterRerouteRequest) {
 	return func(r *ClusterRerouteRequest) {
 		r.FilterPath = v
@@ -255,7 +253,6 @@ func (f ClusterReroute) WithFilterPath(v ...string) func(*ClusterRerouteRequest)
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f ClusterReroute) WithHeader(h map[string]string) func(*ClusterRerouteRequest) {
 	return func(r *ClusterRerouteRequest) {
 		if r.Header == nil {
@@ -268,7 +265,6 @@ func (f ClusterReroute) WithHeader(h map[string]string) func(*ClusterRerouteRequ
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f ClusterReroute) WithOpaqueID(s string) func(*ClusterRerouteRequest) {
 	return func(r *ClusterRerouteRequest) {
 		if r.Header == nil {

@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -29,12 +42,10 @@ func newSearchableSnapshotsClearCacheFunc(t Transport) SearchableSnapshotsClearC
 //
 // This API is experimental.
 //
-// See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/searchable-snapshots-api-clear-cache.html.
-//
+// See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/searchable-snapshots-apis.html.
 type SearchableSnapshotsClearCache func(o ...func(*SearchableSnapshotsClearCacheRequest)) (*Response, error)
 
 // SearchableSnapshotsClearCacheRequest configures the Searchable Snapshots Clear Cache API request.
-//
 type SearchableSnapshotsClearCacheRequest struct {
 	Index []string
 
@@ -53,7 +64,6 @@ type SearchableSnapshotsClearCacheRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r SearchableSnapshotsClearCacheRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -153,7 +163,6 @@ func (r SearchableSnapshotsClearCacheRequest) Do(ctx context.Context, transport 
 }
 
 // WithContext sets the request context.
-//
 func (f SearchableSnapshotsClearCache) WithContext(v context.Context) func(*SearchableSnapshotsClearCacheRequest) {
 	return func(r *SearchableSnapshotsClearCacheRequest) {
 		r.ctx = v
@@ -161,7 +170,6 @@ func (f SearchableSnapshotsClearCache) WithContext(v context.Context) func(*Sear
 }
 
 // WithIndex - a list of index names.
-//
 func (f SearchableSnapshotsClearCache) WithIndex(v ...string) func(*SearchableSnapshotsClearCacheRequest) {
 	return func(r *SearchableSnapshotsClearCacheRequest) {
 		r.Index = v
@@ -169,7 +177,6 @@ func (f SearchableSnapshotsClearCache) WithIndex(v ...string) func(*SearchableSn
 }
 
 // WithAllowNoIndices - whether to ignore if a wildcard indices expression resolves into no concrete indices. (this includes `_all` string or when no indices have been specified).
-//
 func (f SearchableSnapshotsClearCache) WithAllowNoIndices(v bool) func(*SearchableSnapshotsClearCacheRequest) {
 	return func(r *SearchableSnapshotsClearCacheRequest) {
 		r.AllowNoIndices = &v
@@ -177,7 +184,6 @@ func (f SearchableSnapshotsClearCache) WithAllowNoIndices(v bool) func(*Searchab
 }
 
 // WithExpandWildcards - whether to expand wildcard expression to concrete indices that are open, closed or both..
-//
 func (f SearchableSnapshotsClearCache) WithExpandWildcards(v string) func(*SearchableSnapshotsClearCacheRequest) {
 	return func(r *SearchableSnapshotsClearCacheRequest) {
 		r.ExpandWildcards = v
@@ -185,7 +191,6 @@ func (f SearchableSnapshotsClearCache) WithExpandWildcards(v string) func(*Searc
 }
 
 // WithIgnoreUnavailable - whether specified concrete indices should be ignored when unavailable (missing or closed).
-//
 func (f SearchableSnapshotsClearCache) WithIgnoreUnavailable(v bool) func(*SearchableSnapshotsClearCacheRequest) {
 	return func(r *SearchableSnapshotsClearCacheRequest) {
 		r.IgnoreUnavailable = &v
@@ -193,7 +198,6 @@ func (f SearchableSnapshotsClearCache) WithIgnoreUnavailable(v bool) func(*Searc
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f SearchableSnapshotsClearCache) WithPretty() func(*SearchableSnapshotsClearCacheRequest) {
 	return func(r *SearchableSnapshotsClearCacheRequest) {
 		r.Pretty = true
@@ -201,7 +205,6 @@ func (f SearchableSnapshotsClearCache) WithPretty() func(*SearchableSnapshotsCle
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f SearchableSnapshotsClearCache) WithHuman() func(*SearchableSnapshotsClearCacheRequest) {
 	return func(r *SearchableSnapshotsClearCacheRequest) {
 		r.Human = true
@@ -209,7 +212,6 @@ func (f SearchableSnapshotsClearCache) WithHuman() func(*SearchableSnapshotsClea
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f SearchableSnapshotsClearCache) WithErrorTrace() func(*SearchableSnapshotsClearCacheRequest) {
 	return func(r *SearchableSnapshotsClearCacheRequest) {
 		r.ErrorTrace = true
@@ -217,7 +219,6 @@ func (f SearchableSnapshotsClearCache) WithErrorTrace() func(*SearchableSnapshot
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f SearchableSnapshotsClearCache) WithFilterPath(v ...string) func(*SearchableSnapshotsClearCacheRequest) {
 	return func(r *SearchableSnapshotsClearCacheRequest) {
 		r.FilterPath = v
@@ -225,7 +226,6 @@ func (f SearchableSnapshotsClearCache) WithFilterPath(v ...string) func(*Searcha
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f SearchableSnapshotsClearCache) WithHeader(h map[string]string) func(*SearchableSnapshotsClearCacheRequest) {
 	return func(r *SearchableSnapshotsClearCacheRequest) {
 		if r.Header == nil {
@@ -238,7 +238,6 @@ func (f SearchableSnapshotsClearCache) WithHeader(h map[string]string) func(*Sea
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f SearchableSnapshotsClearCache) WithOpaqueID(s string) func(*SearchableSnapshotsClearCacheRequest) {
 	return func(r *SearchableSnapshotsClearCacheRequest) {
 		if r.Header == nil {

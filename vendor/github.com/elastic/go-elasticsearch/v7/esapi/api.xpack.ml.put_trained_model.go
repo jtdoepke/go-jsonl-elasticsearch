@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -10,6 +23,7 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -27,18 +41,16 @@ func newMLPutTrainedModelFunc(t Transport) MLPutTrainedModel {
 
 // MLPutTrainedModel - Creates an inference trained model.
 //
-// This API is experimental.
-//
-// See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/put-inference.html.
-//
+// See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/put-trained-models.html.
 type MLPutTrainedModel func(body io.Reader, model_id string, o ...func(*MLPutTrainedModelRequest)) (*Response, error)
 
 // MLPutTrainedModelRequest configures the ML Put Trained Model API request.
-//
 type MLPutTrainedModelRequest struct {
 	Body io.Reader
 
 	ModelID string
+
+	DeferDefinitionDecompression *bool
 
 	Pretty     bool
 	Human      bool
@@ -51,7 +63,6 @@ type MLPutTrainedModelRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r MLPutTrainedModelRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -61,15 +72,19 @@ func (r MLPutTrainedModelRequest) Do(ctx context.Context, transport Transport) (
 
 	method = "PUT"
 
-	path.Grow(1 + len("_ml") + 1 + len("inference") + 1 + len(r.ModelID))
+	path.Grow(1 + len("_ml") + 1 + len("trained_models") + 1 + len(r.ModelID))
 	path.WriteString("/")
 	path.WriteString("_ml")
 	path.WriteString("/")
-	path.WriteString("inference")
+	path.WriteString("trained_models")
 	path.WriteString("/")
 	path.WriteString(r.ModelID)
 
 	params = make(map[string]string)
+
+	if r.DeferDefinitionDecompression != nil {
+		params["defer_definition_decompression"] = strconv.FormatBool(*r.DeferDefinitionDecompression)
+	}
 
 	if r.Pretty {
 		params["pretty"] = "true"
@@ -100,10 +115,6 @@ func (r MLPutTrainedModelRequest) Do(ctx context.Context, transport Transport) (
 		req.URL.RawQuery = q.Encode()
 	}
 
-	if r.Body != nil {
-		req.Header[headerContentType] = headerContentTypeJSON
-	}
-
 	if len(r.Header) > 0 {
 		if len(req.Header) == 0 {
 			req.Header = r.Header
@@ -114,6 +125,10 @@ func (r MLPutTrainedModelRequest) Do(ctx context.Context, transport Transport) (
 				}
 			}
 		}
+	}
+
+	if r.Body != nil && req.Header.Get(headerContentType) == "" {
+		req.Header[headerContentType] = headerContentTypeJSON
 	}
 
 	if ctx != nil {
@@ -135,15 +150,20 @@ func (r MLPutTrainedModelRequest) Do(ctx context.Context, transport Transport) (
 }
 
 // WithContext sets the request context.
-//
 func (f MLPutTrainedModel) WithContext(v context.Context) func(*MLPutTrainedModelRequest) {
 	return func(r *MLPutTrainedModelRequest) {
 		r.ctx = v
 	}
 }
 
+// WithDeferDefinitionDecompression - if set to `true` and a `compressed_definition` is provided, the request defers definition decompression and skips relevant validations..
+func (f MLPutTrainedModel) WithDeferDefinitionDecompression(v bool) func(*MLPutTrainedModelRequest) {
+	return func(r *MLPutTrainedModelRequest) {
+		r.DeferDefinitionDecompression = &v
+	}
+}
+
 // WithPretty makes the response body pretty-printed.
-//
 func (f MLPutTrainedModel) WithPretty() func(*MLPutTrainedModelRequest) {
 	return func(r *MLPutTrainedModelRequest) {
 		r.Pretty = true
@@ -151,7 +171,6 @@ func (f MLPutTrainedModel) WithPretty() func(*MLPutTrainedModelRequest) {
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f MLPutTrainedModel) WithHuman() func(*MLPutTrainedModelRequest) {
 	return func(r *MLPutTrainedModelRequest) {
 		r.Human = true
@@ -159,7 +178,6 @@ func (f MLPutTrainedModel) WithHuman() func(*MLPutTrainedModelRequest) {
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f MLPutTrainedModel) WithErrorTrace() func(*MLPutTrainedModelRequest) {
 	return func(r *MLPutTrainedModelRequest) {
 		r.ErrorTrace = true
@@ -167,7 +185,6 @@ func (f MLPutTrainedModel) WithErrorTrace() func(*MLPutTrainedModelRequest) {
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f MLPutTrainedModel) WithFilterPath(v ...string) func(*MLPutTrainedModelRequest) {
 	return func(r *MLPutTrainedModelRequest) {
 		r.FilterPath = v
@@ -175,7 +192,6 @@ func (f MLPutTrainedModel) WithFilterPath(v ...string) func(*MLPutTrainedModelRe
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f MLPutTrainedModel) WithHeader(h map[string]string) func(*MLPutTrainedModelRequest) {
 	return func(r *MLPutTrainedModelRequest) {
 		if r.Header == nil {
@@ -188,7 +204,6 @@ func (f MLPutTrainedModel) WithHeader(h map[string]string) func(*MLPutTrainedMod
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f MLPutTrainedModel) WithOpaqueID(s string) func(*MLPutTrainedModelRequest) {
 	return func(r *MLPutTrainedModelRequest) {
 		if r.Header == nil {

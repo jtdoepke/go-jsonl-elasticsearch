@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -28,11 +41,9 @@ func newSecurityChangePasswordFunc(t Transport) SecurityChangePassword {
 // SecurityChangePassword - Changes the passwords of users in the native realm and built-in users.
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api-change-password.html.
-//
 type SecurityChangePassword func(body io.Reader, o ...func(*SecurityChangePasswordRequest)) (*Response, error)
 
 // SecurityChangePasswordRequest configures the Security Change Password API request.
-//
 type SecurityChangePasswordRequest struct {
 	Body io.Reader
 
@@ -51,7 +62,6 @@ type SecurityChangePasswordRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r SecurityChangePasswordRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -108,10 +118,6 @@ func (r SecurityChangePasswordRequest) Do(ctx context.Context, transport Transpo
 		req.URL.RawQuery = q.Encode()
 	}
 
-	if r.Body != nil {
-		req.Header[headerContentType] = headerContentTypeJSON
-	}
-
 	if len(r.Header) > 0 {
 		if len(req.Header) == 0 {
 			req.Header = r.Header
@@ -122,6 +128,10 @@ func (r SecurityChangePasswordRequest) Do(ctx context.Context, transport Transpo
 				}
 			}
 		}
+	}
+
+	if r.Body != nil && req.Header.Get(headerContentType) == "" {
+		req.Header[headerContentType] = headerContentTypeJSON
 	}
 
 	if ctx != nil {
@@ -143,7 +153,6 @@ func (r SecurityChangePasswordRequest) Do(ctx context.Context, transport Transpo
 }
 
 // WithContext sets the request context.
-//
 func (f SecurityChangePassword) WithContext(v context.Context) func(*SecurityChangePasswordRequest) {
 	return func(r *SecurityChangePasswordRequest) {
 		r.ctx = v
@@ -151,7 +160,6 @@ func (f SecurityChangePassword) WithContext(v context.Context) func(*SecurityCha
 }
 
 // WithUsername - the username of the user to change the password for.
-//
 func (f SecurityChangePassword) WithUsername(v string) func(*SecurityChangePasswordRequest) {
 	return func(r *SecurityChangePasswordRequest) {
 		r.Username = v
@@ -159,7 +167,6 @@ func (f SecurityChangePassword) WithUsername(v string) func(*SecurityChangePassw
 }
 
 // WithRefresh - if `true` (the default) then refresh the affected shards to make this operation visible to search, if `wait_for` then wait for a refresh to make this operation visible to search, if `false` then do nothing with refreshes..
-//
 func (f SecurityChangePassword) WithRefresh(v string) func(*SecurityChangePasswordRequest) {
 	return func(r *SecurityChangePasswordRequest) {
 		r.Refresh = v
@@ -167,7 +174,6 @@ func (f SecurityChangePassword) WithRefresh(v string) func(*SecurityChangePasswo
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f SecurityChangePassword) WithPretty() func(*SecurityChangePasswordRequest) {
 	return func(r *SecurityChangePasswordRequest) {
 		r.Pretty = true
@@ -175,7 +181,6 @@ func (f SecurityChangePassword) WithPretty() func(*SecurityChangePasswordRequest
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f SecurityChangePassword) WithHuman() func(*SecurityChangePasswordRequest) {
 	return func(r *SecurityChangePasswordRequest) {
 		r.Human = true
@@ -183,7 +188,6 @@ func (f SecurityChangePassword) WithHuman() func(*SecurityChangePasswordRequest)
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f SecurityChangePassword) WithErrorTrace() func(*SecurityChangePasswordRequest) {
 	return func(r *SecurityChangePasswordRequest) {
 		r.ErrorTrace = true
@@ -191,7 +195,6 @@ func (f SecurityChangePassword) WithErrorTrace() func(*SecurityChangePasswordReq
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f SecurityChangePassword) WithFilterPath(v ...string) func(*SecurityChangePasswordRequest) {
 	return func(r *SecurityChangePasswordRequest) {
 		r.FilterPath = v
@@ -199,7 +202,6 @@ func (f SecurityChangePassword) WithFilterPath(v ...string) func(*SecurityChange
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f SecurityChangePassword) WithHeader(h map[string]string) func(*SecurityChangePasswordRequest) {
 	return func(r *SecurityChangePasswordRequest) {
 		if r.Header == nil {
@@ -212,7 +214,6 @@ func (f SecurityChangePassword) WithHeader(h map[string]string) func(*SecurityCh
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f SecurityChangePassword) WithOpaqueID(s string) func(*SecurityChangePasswordRequest) {
 	return func(r *SecurityChangePasswordRequest) {
 		if r.Header == nil {

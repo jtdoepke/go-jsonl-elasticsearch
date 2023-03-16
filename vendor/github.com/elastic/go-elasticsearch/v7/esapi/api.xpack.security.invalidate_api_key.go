@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -28,11 +41,9 @@ func newSecurityInvalidateAPIKeyFunc(t Transport) SecurityInvalidateAPIKey {
 // SecurityInvalidateAPIKey - Invalidates one or more API keys.
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api-invalidate-api-key.html.
-//
 type SecurityInvalidateAPIKey func(body io.Reader, o ...func(*SecurityInvalidateAPIKeyRequest)) (*Response, error)
 
 // SecurityInvalidateAPIKeyRequest configures the Security InvalidateAPI Key API request.
-//
 type SecurityInvalidateAPIKeyRequest struct {
 	Body io.Reader
 
@@ -47,7 +58,6 @@ type SecurityInvalidateAPIKeyRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r SecurityInvalidateAPIKeyRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -91,10 +101,6 @@ func (r SecurityInvalidateAPIKeyRequest) Do(ctx context.Context, transport Trans
 		req.URL.RawQuery = q.Encode()
 	}
 
-	if r.Body != nil {
-		req.Header[headerContentType] = headerContentTypeJSON
-	}
-
 	if len(r.Header) > 0 {
 		if len(req.Header) == 0 {
 			req.Header = r.Header
@@ -105,6 +111,10 @@ func (r SecurityInvalidateAPIKeyRequest) Do(ctx context.Context, transport Trans
 				}
 			}
 		}
+	}
+
+	if r.Body != nil && req.Header.Get(headerContentType) == "" {
+		req.Header[headerContentType] = headerContentTypeJSON
 	}
 
 	if ctx != nil {
@@ -126,7 +136,6 @@ func (r SecurityInvalidateAPIKeyRequest) Do(ctx context.Context, transport Trans
 }
 
 // WithContext sets the request context.
-//
 func (f SecurityInvalidateAPIKey) WithContext(v context.Context) func(*SecurityInvalidateAPIKeyRequest) {
 	return func(r *SecurityInvalidateAPIKeyRequest) {
 		r.ctx = v
@@ -134,7 +143,6 @@ func (f SecurityInvalidateAPIKey) WithContext(v context.Context) func(*SecurityI
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f SecurityInvalidateAPIKey) WithPretty() func(*SecurityInvalidateAPIKeyRequest) {
 	return func(r *SecurityInvalidateAPIKeyRequest) {
 		r.Pretty = true
@@ -142,7 +150,6 @@ func (f SecurityInvalidateAPIKey) WithPretty() func(*SecurityInvalidateAPIKeyReq
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f SecurityInvalidateAPIKey) WithHuman() func(*SecurityInvalidateAPIKeyRequest) {
 	return func(r *SecurityInvalidateAPIKeyRequest) {
 		r.Human = true
@@ -150,7 +157,6 @@ func (f SecurityInvalidateAPIKey) WithHuman() func(*SecurityInvalidateAPIKeyRequ
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f SecurityInvalidateAPIKey) WithErrorTrace() func(*SecurityInvalidateAPIKeyRequest) {
 	return func(r *SecurityInvalidateAPIKeyRequest) {
 		r.ErrorTrace = true
@@ -158,7 +164,6 @@ func (f SecurityInvalidateAPIKey) WithErrorTrace() func(*SecurityInvalidateAPIKe
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f SecurityInvalidateAPIKey) WithFilterPath(v ...string) func(*SecurityInvalidateAPIKeyRequest) {
 	return func(r *SecurityInvalidateAPIKeyRequest) {
 		r.FilterPath = v
@@ -166,7 +171,6 @@ func (f SecurityInvalidateAPIKey) WithFilterPath(v ...string) func(*SecurityInva
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f SecurityInvalidateAPIKey) WithHeader(h map[string]string) func(*SecurityInvalidateAPIKeyRequest) {
 	return func(r *SecurityInvalidateAPIKeyRequest) {
 		if r.Header == nil {
@@ -179,7 +183,6 @@ func (f SecurityInvalidateAPIKey) WithHeader(h map[string]string) func(*Security
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f SecurityInvalidateAPIKey) WithOpaqueID(s string) func(*SecurityInvalidateAPIKeyRequest) {
 	return func(r *SecurityInvalidateAPIKeyRequest) {
 		if r.Header == nil {

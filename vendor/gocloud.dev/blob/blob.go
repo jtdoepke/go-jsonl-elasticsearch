@@ -18,8 +18,7 @@
 //
 // See https://gocloud.dev/howto/blob/ for a detailed how-to guide.
 //
-//
-// Errors
+// # Errors
 //
 // The errors returned from this package can be inspected in several ways:
 //
@@ -29,19 +28,20 @@
 // The Bucket.ErrorAs method can retrieve the driver error underlying the returned
 // error.
 //
-//
-// OpenCensus Integration
+// # OpenCensus Integration
 //
 // OpenCensus supports tracing and metric collection for multiple languages and
 // backend providers. See https://opencensus.io.
 //
 // This API collects OpenCensus traces and metrics for the following methods:
-//  - Attributes
-//  - Copy
-//  - Delete
-//  - NewRangeReader, from creation until the call to Close. (NewReader and ReadAll
-//    are included because they call NewRangeReader.)
-//  - NewWriter, from creation until the call to Close.
+//   - Attributes
+//   - Copy
+//   - Delete
+//   - ListPage
+//   - NewRangeReader, from creation until the call to Close. (NewReader and ReadAll
+//     are included because they call NewRangeReader.)
+//   - NewWriter, from creation until the call to Close.
+//
 // All trace and metric names begin with the package import path.
 // The traces add the method name.
 // For example, "gocloud.dev/blob/Attributes".
@@ -51,8 +51,8 @@
 // For example, "gocloud.dev/blob/latency".
 //
 // It also collects the following metrics:
-//  - gocloud.dev/blob/bytes_read: the total number of bytes read, by driver.
-//  - gocloud.dev/blob/bytes_written: the total number of bytes written, by driver.
+//   - gocloud.dev/blob/bytes_read: the total number of bytes read, by driver.
+//   - gocloud.dev/blob/bytes_written: the total number of bytes written, by driver.
 //
 // To enable trace collection in your application, see "Configure Exporter" at
 // https://opencensus.io/quickstart/go/tracing.
@@ -88,24 +88,107 @@ import (
 	"gocloud.dev/internal/openurl"
 )
 
+// Ensure that Reader implements io.ReadSeekCloser.
+var _ = io.ReadSeekCloser(&Reader{})
+
 // Reader reads bytes from a blob.
-// It implements io.ReadCloser, and must be closed after
+// It implements io.ReadSeekCloser, and must be closed after
 // reads are finished.
 type Reader struct {
-	b        driver.Bucket
-	r        driver.Reader
-	key      string
-	end      func(error) // called at Close to finish trace and metric collection
-	provider string      // for metric collection; refers to driver package
-	closed   bool
+	b              driver.Bucket
+	r              driver.Reader
+	key            string
+	ctx            context.Context       // Used to recreate r after Seeks
+	dopts          *driver.ReaderOptions // "
+	baseOffset     int64                 // The base offset provided to NewRangeReader.
+	baseLength     int64                 // The length provided to NewRangeReader (may be negative).
+	relativeOffset int64                 // Current offset (relative to baseOffset).
+	savedOffset    int64                 // Last relativeOffset for r, saved after relativeOffset is changed in Seek, or -1 if no Seek.
+	end            func(error)           // Called at Close to finish trace and metric collection.
+	// for metric collection;
+	statsTagMutators []tag.Mutator
+	bytesRead        int
+	closed           bool
 }
 
 // Read implements io.Reader (https://golang.org/pkg/io/#Reader).
 func (r *Reader) Read(p []byte) (int, error) {
+	if r.savedOffset != -1 {
+		// We've done one or more Seeks since the last read. We may have
+		// to recreate the Reader.
+		//
+		// Note that remembering the savedOffset and lazily resetting the
+		// reader like this allows the caller to Seek, then Seek again back,
+		// to the original offset, without having to recreate the reader.
+		// We only have to recreate the reader if we actually read after a Seek.
+		// This is an important optimization because it's common to Seek
+		// to (SeekEnd, 0) and use the return value to determine the size
+		// of the data, then Seek back to (SeekStart, 0).
+		saved := r.savedOffset
+		r.savedOffset = -1
+		if r.relativeOffset == saved {
+			// Nope! We're at the same place we left off.
+		} else {
+			// Yep! We've changed the offset. Recreate the reader.
+			_ = r.r.Close()
+			length := r.baseLength
+			if length >= 0 {
+				length -= r.relativeOffset
+				if length < 0 {
+					// Shouldn't happen based on checks in Seek.
+					return 0, gcerr.Newf(gcerr.Internal, nil, "blob: invalid Seek (base length %d, relative offset %d)", r.baseLength, r.relativeOffset)
+				}
+			}
+			var err error
+			r.r, err = r.b.NewRangeReader(r.ctx, r.key, r.baseOffset+r.relativeOffset, length, r.dopts)
+			if err != nil {
+				return 0, wrapError(r.b, err, r.key)
+			}
+		}
+	}
 	n, err := r.r.Read(p)
-	stats.RecordWithTags(context.Background(), []tag.Mutator{tag.Upsert(oc.ProviderKey, r.provider)},
-		bytesReadMeasure.M(int64(n)))
+	r.bytesRead += n
+	r.relativeOffset += int64(n)
 	return n, wrapError(r.b, err, r.key)
+}
+
+// Seek implements io.Seeker (https://golang.org/pkg/io/#Seeker).
+func (r *Reader) Seek(offset int64, whence int) (int64, error) {
+	if r.savedOffset == -1 {
+		// Save the current offset for our reader. If the Seek changes the
+		// offset, and then we try to read, we'll need to recreate the reader.
+		// See comment above in Read for why we do it lazily.
+		r.savedOffset = r.relativeOffset
+	}
+	// The maximum relative offset is the minimum of:
+	// 1. The actual size of the blob, minus our initial baseOffset.
+	// 2. The length provided to NewRangeReader (if it was non-negative).
+	maxRelativeOffset := r.Size() - r.baseOffset
+	if r.baseLength >= 0 && r.baseLength < maxRelativeOffset {
+		maxRelativeOffset = r.baseLength
+	}
+	switch whence {
+	case io.SeekStart:
+		r.relativeOffset = offset
+	case io.SeekCurrent:
+		r.relativeOffset += offset
+	case io.SeekEnd:
+		r.relativeOffset = maxRelativeOffset + offset
+	}
+	if r.relativeOffset < 0 {
+		// "Seeking to an offset before the start of the file is an error."
+		invalidOffset := r.relativeOffset
+		r.relativeOffset = 0
+		return 0, fmt.Errorf("Seek resulted in invalid offset %d, using 0", invalidOffset)
+	}
+	if r.relativeOffset > maxRelativeOffset {
+		// "Seeking to any positive offset is legal, but the behavior of subsequent
+		// I/O operations on the underlying object is implementation-dependent."
+		// We'll choose to set the offset to the EOF.
+		log.Printf("blob.Reader.Seek set an offset after EOF (base offset/length from NewRangeReader %d, %d; actual blob size %d; relative offset %d -> absolute offset %d).", r.baseOffset, r.baseLength, r.Size(), r.relativeOffset, r.baseOffset+r.relativeOffset)
+		r.relativeOffset = maxRelativeOffset
+	}
+	return r.relativeOffset, nil
 }
 
 // Close implements io.Closer (https://golang.org/pkg/io/#Closer).
@@ -113,6 +196,11 @@ func (r *Reader) Close() error {
 	r.closed = true
 	err := wrapError(r.b, r.r.Close(), r.key)
 	r.end(err)
+	// Emit only on close to avoid an allocation on each call to Read().
+	stats.RecordWithTags(
+		context.Background(),
+		r.statsTagMutators,
+		bytesReadMeasure.M(int64(r.bytesRead)))
 	return err
 }
 
@@ -202,12 +290,17 @@ type Attributes struct {
 	// case-insensitive keys (e.g., "foo" and "FOO"), only one value
 	// will be kept, and it is undefined which one.
 	Metadata map[string]string
+	// CreateTime is the time the blob was created, if available. If not available,
+	// CreateTime will be the zero time.
+	CreateTime time.Time
 	// ModTime is the time the blob was last modified.
 	ModTime time.Time
 	// Size is the size of the blob's content in bytes.
 	Size int64
 	// MD5 is an MD5 hash of the blob contents or nil if not available.
 	MD5 []byte
+	// ETag for the blob; see https://en.wikipedia.org/wiki/HTTP_ETag.
+	ETag string
 
 	asFunc func(interface{}) bool
 }
@@ -228,15 +321,16 @@ func (a *Attributes) As(i interface{}) bool {
 // It implements io.WriteCloser (https://golang.org/pkg/io/#Closer), and must be
 // closed after all writes are done.
 type Writer struct {
-	b          driver.Bucket
-	w          driver.Writer
-	key        string
-	end        func(error) // called at Close to finish trace and metric collection
-	cancel     func()      // cancels the ctx provided to NewTypedWriter if contentMD5 verification fails
-	contentMD5 []byte
-	md5hash    hash.Hash
-	provider   string // for metric collection, refers to driver package name
-	closed     bool
+	b                driver.Bucket
+	w                driver.Writer
+	key              string
+	end              func(error) // called at Close to finish trace and metric collection
+	cancel           func()      // cancels the ctx provided to NewTypedWriter if contentMD5 verification fails
+	contentMD5       []byte
+	md5hash          hash.Hash
+	statsTagMutators []tag.Mutator // for metric collection
+	bytesWritten     int
+	closed           bool
 
 	// These fields are non-zero values only when w is nil (not yet created).
 	//
@@ -300,7 +394,14 @@ func (w *Writer) Write(p []byte) (int, error) {
 // canceled or reaches its deadline.
 func (w *Writer) Close() (err error) {
 	w.closed = true
-	defer func() { w.end(err) }()
+	defer func() {
+		w.end(err)
+		// Emit only on close to avoid an allocation on each call to Write().
+		stats.RecordWithTags(
+			context.Background(),
+			w.statsTagMutators,
+			bytesWrittenMeasure.M(int64(w.bytesWritten)))
+	}()
 	if len(w.contentMD5) > 0 {
 		// Verify the MD5 hash of what was written matches the ContentMD5 provided
 		// by the user.
@@ -344,8 +445,7 @@ func (w *Writer) open(p []byte) (int, error) {
 
 func (w *Writer) write(p []byte) (int, error) {
 	n, err := w.w.Write(p)
-	stats.RecordWithTags(context.Background(), []tag.Mutator{tag.Upsert(oc.ProviderKey, w.provider)},
-		bytesWrittenMeasure.M(int64(n)))
+	w.bytesWritten += n
 	return n, wrapError(w.b, err, w.key)
 }
 
@@ -578,6 +678,114 @@ func (b *Bucket) List(opts *ListOptions) *ListIterator {
 	return &ListIterator{b: b, opts: dopts}
 }
 
+// FirstPageToken is the pageToken to pass to ListPage to retrieve the first page of results.
+var FirstPageToken = []byte("first page")
+
+// ListPage returns a page of ListObject results for blobs in a bucket, in lexicographical
+// order of UTF-8 encoded keys.
+//
+// To fetch the first page, pass FirstPageToken as the pageToken. For subsequent pages, pass
+// the pageToken returned from a previous call to ListPage.
+// It is not possible to "skip ahead" pages.
+//
+// Each call will return pageSize results, unless there are not enough blobs to fill the
+// page, in which case it will return fewer results (possibly 0).
+//
+// If there are no more blobs available, ListPage will return an empty pageToken. Note that
+// this may happen regardless of the number of returned results -- the last page might have
+// 0 results (i.e., if the last item was deleted), pageSize results, or anything in between.
+//
+// Calling ListPage with an empty pageToken will immediately return io.EOF. When looping
+// over pages, callers can either check for an empty pageToken, or they can make one more
+// call and check for io.EOF.
+//
+// The underlying implementation fetches results in pages, but one call to ListPage may
+// require multiple page fetches (and therefore, multiple calls to the BeforeList callback).
+//
+// A nil ListOptions is treated the same as the zero value.
+//
+// ListPage is not guaranteed to include all recently-written blobs;
+// some services are only eventually consistent.
+func (b *Bucket) ListPage(ctx context.Context, pageToken []byte, pageSize int, opts *ListOptions) (retval []*ListObject, nextPageToken []byte, err error) {
+	if opts == nil {
+		opts = &ListOptions{}
+	}
+	if pageSize <= 0 {
+		return nil, nil, gcerr.Newf(gcerr.InvalidArgument, nil, "blob: pageSize must be > 0")
+	}
+
+	// Nil pageToken means no more results.
+	if len(pageToken) == 0 {
+		return nil, nil, io.EOF
+	}
+
+	// FirstPageToken fetches the first page. Drivers use nil.
+	// The public API doesn't use nil for the first page because it would be too easy to
+	// keep fetching forever (since the last page return nil for the next pageToken).
+	if bytes.Equal(pageToken, FirstPageToken) {
+		pageToken = nil
+	}
+	b.mu.RLock()
+	defer b.mu.RUnlock()
+	if b.closed {
+		return nil, nil, errClosed
+	}
+
+	ctx = b.tracer.Start(ctx, "ListPage")
+	defer func() { b.tracer.End(ctx, err) }()
+
+	dopts := &driver.ListOptions{
+		Prefix:     opts.Prefix,
+		Delimiter:  opts.Delimiter,
+		BeforeList: opts.BeforeList,
+		PageToken:  pageToken,
+		PageSize:   pageSize,
+	}
+	retval = make([]*ListObject, 0, pageSize)
+	for len(retval) < pageSize {
+		p, err := b.b.ListPaged(ctx, dopts)
+		if err != nil {
+			return nil, nil, wrapError(b.b, err, "")
+		}
+		for _, dobj := range p.Objects {
+			retval = append(retval, &ListObject{
+				Key:     dobj.Key,
+				ModTime: dobj.ModTime,
+				Size:    dobj.Size,
+				MD5:     dobj.MD5,
+				IsDir:   dobj.IsDir,
+				asFunc:  dobj.AsFunc,
+			})
+		}
+		// ListPaged may return fewer results than pageSize. If there are more results
+		// available, signalled by non-empty p.NextPageToken, try to fetch the remainder
+		// of the page.
+		// It does not work to ask for more results than we need, because then we'd have
+		// a NextPageToken on a non-page boundary.
+		dopts.PageSize = pageSize - len(retval)
+		dopts.PageToken = p.NextPageToken
+		if len(dopts.PageToken) == 0 {
+			dopts.PageToken = nil
+			break
+		}
+	}
+	return retval, dopts.PageToken, nil
+}
+
+// IsAccessible returns true if the bucket is accessible, false otherwise.
+// It is a shortcut for calling ListPage and checking if it returns an error
+// with code gcerrors.NotFound.
+func (b *Bucket) IsAccessible(ctx context.Context) (bool, error) {
+	_, _, err := b.ListPage(ctx, FirstPageToken, 1, nil)
+	if err == nil {
+		return true, nil
+	}
+	if gcerrors.Code(err) == gcerrors.NotFound {
+		return false, nil
+	}
+	return false, err
+}
+
 // Exists returns true if a blob exists at key, false if it does not exist, or
 // an error.
 // It is a shortcut for calling Attributes and checking if it returns an error
@@ -631,9 +839,11 @@ func (b *Bucket) Attributes(ctx context.Context, key string) (_ *Attributes, err
 		ContentLanguage:    a.ContentLanguage,
 		ContentType:        a.ContentType,
 		Metadata:           md,
+		CreateTime:         a.CreateTime,
 		ModTime:            a.ModTime,
 		Size:               a.Size,
 		MD5:                a.MD5,
+		ETag:               a.ETag,
 		asFunc:             a.AsFunc,
 	}, nil
 }
@@ -646,6 +856,11 @@ func (b *Bucket) NewReader(ctx context.Context, key string, opts *ReaderOptions)
 // NewRangeReader returns a Reader to read content from the blob stored at key.
 // It reads at most length bytes starting at offset (>= 0).
 // If length is negative, it will read till the end of the blob.
+//
+// For the purposes of Seek, the returned Reader will start at offset and
+// end at the minimum of the actual end of the blob or (if length > 0) offset + length.
+//
+// Note that ctx is used for all reads performed during the lifetime of the reader.
 //
 // If the blob does not exist, NewRangeReader returns an error for which
 // gcerrors.Code will return gcerrors.NotFound. Exists is a lighter-weight way
@@ -678,18 +893,30 @@ func (b *Bucket) newRangeReader(ctx context.Context, key string, offset, length 
 	}
 	tctx := b.tracer.Start(ctx, "NewRangeReader")
 	defer func() {
-		// If err == nil, we handed the end closure off to the returned *Writer; it
-		// will be called when the Writer is Closed.
+		// If err == nil, we handed the end closure off to the returned *Reader; it
+		// will be called when the Reader is Closed.
 		if err != nil {
 			b.tracer.End(tctx, err)
 		}
 	}()
-	dr, err := b.b.NewRangeReader(ctx, key, offset, length, dopts)
+	var dr driver.Reader
+	dr, err = b.b.NewRangeReader(ctx, key, offset, length, dopts)
 	if err != nil {
 		return nil, wrapError(b.b, err, key)
 	}
 	end := func(err error) { b.tracer.End(tctx, err) }
-	r := &Reader{b: b.b, r: dr, key: key, end: end, provider: b.tracer.Provider}
+	r := &Reader{
+		b:                b.b,
+		r:                dr,
+		key:              key,
+		ctx:              ctx,
+		dopts:            dopts,
+		baseOffset:       offset,
+		baseLength:       length,
+		savedOffset:      -1,
+		end:              end,
+		statsTagMutators: []tag.Mutator{tag.Upsert(oc.ProviderKey, b.tracer.Provider)},
+	}
 	_, file, lineno, ok := runtime.Caller(2)
 	runtime.SetFinalizer(r, func(r *Reader) {
 		if !r.closed {
@@ -756,6 +983,7 @@ func (b *Bucket) NewWriter(ctx context.Context, key string, opts *WriterOptions)
 		ContentLanguage:    opts.ContentLanguage,
 		ContentMD5:         opts.ContentMD5,
 		BufferSize:         opts.BufferSize,
+		MaxConcurrency:     opts.MaxConcurrency,
 		BeforeWrite:        opts.BeforeWrite,
 	}
 	if len(opts.Metadata) > 0 {
@@ -796,13 +1024,13 @@ func (b *Bucket) NewWriter(ctx context.Context, key string, opts *WriterOptions)
 	}()
 
 	w := &Writer{
-		b:          b.b,
-		end:        end,
-		cancel:     cancel,
-		key:        key,
-		contentMD5: opts.ContentMD5,
-		md5hash:    md5.New(),
-		provider:   b.tracer.Provider,
+		b:                b.b,
+		end:              end,
+		cancel:           cancel,
+		key:              key,
+		contentMD5:       opts.ContentMD5,
+		md5hash:          md5.New(),
+		statsTagMutators: []tag.Mutator{tag.Upsert(oc.ProviderKey, b.tracer.Provider)},
 	}
 	if opts.ContentType != "" {
 		t, p, err := mime.ParseMediaType(opts.ContentType)
@@ -885,8 +1113,8 @@ func (b *Bucket) Delete(ctx context.Context, key string) (err error) {
 	return wrapError(b.b, b.b.Delete(ctx, key), key)
 }
 
-// SignedURL returns a URL that can be used to GET the blob for the duration
-// specified in opts.Expiry.
+// SignedURL returns a URL that can be used to GET (default), PUT or DELETE
+// the blob for the duration specified in opts.Expiry.
 //
 // A nil SignedURLOptions is treated the same as the zero value.
 //
@@ -926,6 +1154,7 @@ func (b *Bucket) SignedURL(ctx context.Context, key string, opts *SignedURLOptio
 	}
 	dopts.ContentType = opts.ContentType
 	dopts.EnforceAbsentContentType = opts.EnforceAbsentContentType
+	dopts.BeforeSign = opts.BeforeSign
 	b.mu.RLock()
 	defer b.mu.RUnlock()
 	if b.closed {
@@ -980,13 +1209,22 @@ type SignedURLOptions struct {
 	//
 	// Must be false for non-PUT requests.
 	EnforceAbsentContentType bool
+
+	// BeforeSign is a callback that will be called before each call to the
+	// the underlying service's sign functionality.
+	// asFunc converts its argument to driver-specific types.
+	// See https://gocloud.dev/concepts/as/ for background information.
+	BeforeSign func(asFunc func(interface{}) bool) error
 }
 
 // ReaderOptions sets options for NewReader and NewRangeReader.
 type ReaderOptions struct {
-	// BeforeRead is a callback that will be called exactly once, before
+	// BeforeRead is a callback that will be called before
 	// any data is read (unless NewReader returns an error before then, in which
 	// case it may not be called at all).
+	//
+	// Calling Seek may reset the underlying reader, and result in BeforeRead
+	// getting called again with a different underlying provider-specific reader..
 	//
 	// asFunc converts its argument to driver-specific types.
 	// See https://gocloud.dev/concepts/as/ for background information.
@@ -1006,6 +1244,13 @@ type WriterOptions struct {
 	// If the Writer is used to do many small writes concurrently, using a
 	// smaller BufferSize may reduce memory usage.
 	BufferSize int
+
+	// MaxConcurrency changes the default concurrency for parts of an upload.
+	//
+	// This option may be ignored by some drivers.
+	//
+	// If 0, the driver will choose a reasonable default.
+	MaxConcurrency int
 
 	// CacheControl specifies caching attributes that services may use
 	// when serving the blob.
@@ -1117,11 +1362,13 @@ func (mux *URLMux) OpenBucketURL(ctx context.Context, u *url.URL) (*Bucket, erro
 
 func applyPrefixParam(ctx context.Context, opener BucketURLOpener, u *url.URL) (*Bucket, error) {
 	prefix := u.Query().Get("prefix")
-	if prefix != "" {
-		// Make a copy of u with the "prefix" parameter removed.
+	singleKey := u.Query().Get("key")
+	if prefix != "" || singleKey != "" {
+		// Make a copy of u with the "prefix" and "key" parameters removed.
 		urlCopy := *u
 		q := urlCopy.Query()
 		q.Del("prefix")
+		q.Del("key")
 		urlCopy.RawQuery = q.Encode()
 		u = &urlCopy
 	}
@@ -1131,6 +1378,9 @@ func applyPrefixParam(ctx context.Context, opener BucketURLOpener, u *url.URL) (
 	}
 	if prefix != "" {
 		bucket = PrefixedBucket(bucket, prefix)
+	}
+	if singleKey != "" {
+		bucket = SingleKeyBucket(bucket, singleKey)
 	}
 	return bucket, nil
 }
@@ -1154,7 +1404,9 @@ func DefaultURLMux() *URLMux {
 // the following query parameters:
 //
 //   - prefix: wraps the resulting Bucket using PrefixedBucket with the
-//             given prefix.
+//     given prefix.
+//   - key: wraps the resulting Bucket using SingleKeyBucket with the
+//     given key.
 func OpenBucket(ctx context.Context, urlstr string) (*Bucket, error) {
 	return defaultURLMux.OpenBucket(ctx, urlstr)
 }
@@ -1170,7 +1422,11 @@ func wrapError(b driver.Bucket, err error, key string) error {
 	if key != "" {
 		msg += fmt.Sprintf(" (key %q)", key)
 	}
-	return gcerr.New(b.ErrorCode(err), err, 2, msg)
+	code := gcerrors.Code(err)
+	if code == gcerrors.Unknown {
+		code = b.ErrorCode(err)
+	}
+	return gcerr.New(code, err, 2, msg)
 }
 
 var errClosed = gcerr.Newf(gcerr.FailedPrecondition, nil, "blob: Bucket has been closed")
@@ -1185,4 +1441,16 @@ func PrefixedBucket(bucket *Bucket, prefix string) *Bucket {
 	defer bucket.mu.Unlock()
 	bucket.closed = true
 	return NewBucket(driver.NewPrefixedBucket(bucket.b, prefix))
+}
+
+// SingleKeyBucket returns a *Bucket based on b that always references singleKey.
+// List methods will not work.
+// singleKey acts as srcKey for Copy.
+//
+// bucket will be closed and no longer usable after this function returns.
+func SingleKeyBucket(bucket *Bucket, singleKey string) *Bucket {
+	bucket.mu.Lock()
+	defer bucket.mu.Unlock()
+	bucket.closed = true
+	return NewBucket(driver.NewSingleKeyBucket(bucket.b, singleKey))
 }

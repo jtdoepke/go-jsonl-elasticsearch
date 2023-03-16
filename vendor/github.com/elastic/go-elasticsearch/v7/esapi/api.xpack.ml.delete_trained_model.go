@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -26,14 +39,10 @@ func newMLDeleteTrainedModelFunc(t Transport) MLDeleteTrainedModel {
 
 // MLDeleteTrainedModel - Deletes an existing trained inference model that is currently not referenced by an ingest pipeline.
 //
-// This API is experimental.
-//
-// See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/delete-inference.html.
-//
+// See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/delete-trained-models.html.
 type MLDeleteTrainedModel func(model_id string, o ...func(*MLDeleteTrainedModelRequest)) (*Response, error)
 
 // MLDeleteTrainedModelRequest configures the ML Delete Trained Model API request.
-//
 type MLDeleteTrainedModelRequest struct {
 	ModelID string
 
@@ -48,7 +57,6 @@ type MLDeleteTrainedModelRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r MLDeleteTrainedModelRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -58,11 +66,11 @@ func (r MLDeleteTrainedModelRequest) Do(ctx context.Context, transport Transport
 
 	method = "DELETE"
 
-	path.Grow(1 + len("_ml") + 1 + len("inference") + 1 + len(r.ModelID))
+	path.Grow(1 + len("_ml") + 1 + len("trained_models") + 1 + len(r.ModelID))
 	path.WriteString("/")
 	path.WriteString("_ml")
 	path.WriteString("/")
-	path.WriteString("inference")
+	path.WriteString("trained_models")
 	path.WriteString("/")
 	path.WriteString(r.ModelID)
 
@@ -128,7 +136,6 @@ func (r MLDeleteTrainedModelRequest) Do(ctx context.Context, transport Transport
 }
 
 // WithContext sets the request context.
-//
 func (f MLDeleteTrainedModel) WithContext(v context.Context) func(*MLDeleteTrainedModelRequest) {
 	return func(r *MLDeleteTrainedModelRequest) {
 		r.ctx = v
@@ -136,7 +143,6 @@ func (f MLDeleteTrainedModel) WithContext(v context.Context) func(*MLDeleteTrain
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f MLDeleteTrainedModel) WithPretty() func(*MLDeleteTrainedModelRequest) {
 	return func(r *MLDeleteTrainedModelRequest) {
 		r.Pretty = true
@@ -144,7 +150,6 @@ func (f MLDeleteTrainedModel) WithPretty() func(*MLDeleteTrainedModelRequest) {
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f MLDeleteTrainedModel) WithHuman() func(*MLDeleteTrainedModelRequest) {
 	return func(r *MLDeleteTrainedModelRequest) {
 		r.Human = true
@@ -152,7 +157,6 @@ func (f MLDeleteTrainedModel) WithHuman() func(*MLDeleteTrainedModelRequest) {
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f MLDeleteTrainedModel) WithErrorTrace() func(*MLDeleteTrainedModelRequest) {
 	return func(r *MLDeleteTrainedModelRequest) {
 		r.ErrorTrace = true
@@ -160,7 +164,6 @@ func (f MLDeleteTrainedModel) WithErrorTrace() func(*MLDeleteTrainedModelRequest
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f MLDeleteTrainedModel) WithFilterPath(v ...string) func(*MLDeleteTrainedModelRequest) {
 	return func(r *MLDeleteTrainedModelRequest) {
 		r.FilterPath = v
@@ -168,7 +171,6 @@ func (f MLDeleteTrainedModel) WithFilterPath(v ...string) func(*MLDeleteTrainedM
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f MLDeleteTrainedModel) WithHeader(h map[string]string) func(*MLDeleteTrainedModelRequest) {
 	return func(r *MLDeleteTrainedModelRequest) {
 		if r.Header == nil {
@@ -181,7 +183,6 @@ func (f MLDeleteTrainedModel) WithHeader(h map[string]string) func(*MLDeleteTrai
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f MLDeleteTrainedModel) WithOpaqueID(s string) func(*MLDeleteTrainedModelRequest) {
 	return func(r *MLDeleteTrainedModelRequest) {
 		if r.Header == nil {

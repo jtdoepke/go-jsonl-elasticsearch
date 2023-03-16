@@ -1,8 +1,21 @@
-// Licensed to Elasticsearch B.V under one or more agreements.
-// Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
-// See the LICENSE file in the project root for more information.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// Code generated from specification version 7.8.0: DO NOT EDIT
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
@@ -28,11 +41,9 @@ func newSecurityPutUserFunc(t Transport) SecurityPutUser {
 // SecurityPutUser - Adds and updates users in the native realm. These users are commonly referred to as native users.
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api-put-user.html.
-//
 type SecurityPutUser func(username string, body io.Reader, o ...func(*SecurityPutUserRequest)) (*Response, error)
 
 // SecurityPutUserRequest configures the Security Put User API request.
-//
 type SecurityPutUserRequest struct {
 	Body io.Reader
 
@@ -51,7 +62,6 @@ type SecurityPutUserRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r SecurityPutUserRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -104,10 +114,6 @@ func (r SecurityPutUserRequest) Do(ctx context.Context, transport Transport) (*R
 		req.URL.RawQuery = q.Encode()
 	}
 
-	if r.Body != nil {
-		req.Header[headerContentType] = headerContentTypeJSON
-	}
-
 	if len(r.Header) > 0 {
 		if len(req.Header) == 0 {
 			req.Header = r.Header
@@ -118,6 +124,10 @@ func (r SecurityPutUserRequest) Do(ctx context.Context, transport Transport) (*R
 				}
 			}
 		}
+	}
+
+	if r.Body != nil && req.Header.Get(headerContentType) == "" {
+		req.Header[headerContentType] = headerContentTypeJSON
 	}
 
 	if ctx != nil {
@@ -139,7 +149,6 @@ func (r SecurityPutUserRequest) Do(ctx context.Context, transport Transport) (*R
 }
 
 // WithContext sets the request context.
-//
 func (f SecurityPutUser) WithContext(v context.Context) func(*SecurityPutUserRequest) {
 	return func(r *SecurityPutUserRequest) {
 		r.ctx = v
@@ -147,7 +156,6 @@ func (f SecurityPutUser) WithContext(v context.Context) func(*SecurityPutUserReq
 }
 
 // WithRefresh - if `true` (the default) then refresh the affected shards to make this operation visible to search, if `wait_for` then wait for a refresh to make this operation visible to search, if `false` then do nothing with refreshes..
-//
 func (f SecurityPutUser) WithRefresh(v string) func(*SecurityPutUserRequest) {
 	return func(r *SecurityPutUserRequest) {
 		r.Refresh = v
@@ -155,7 +163,6 @@ func (f SecurityPutUser) WithRefresh(v string) func(*SecurityPutUserRequest) {
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f SecurityPutUser) WithPretty() func(*SecurityPutUserRequest) {
 	return func(r *SecurityPutUserRequest) {
 		r.Pretty = true
@@ -163,7 +170,6 @@ func (f SecurityPutUser) WithPretty() func(*SecurityPutUserRequest) {
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f SecurityPutUser) WithHuman() func(*SecurityPutUserRequest) {
 	return func(r *SecurityPutUserRequest) {
 		r.Human = true
@@ -171,7 +177,6 @@ func (f SecurityPutUser) WithHuman() func(*SecurityPutUserRequest) {
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f SecurityPutUser) WithErrorTrace() func(*SecurityPutUserRequest) {
 	return func(r *SecurityPutUserRequest) {
 		r.ErrorTrace = true
@@ -179,7 +184,6 @@ func (f SecurityPutUser) WithErrorTrace() func(*SecurityPutUserRequest) {
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f SecurityPutUser) WithFilterPath(v ...string) func(*SecurityPutUserRequest) {
 	return func(r *SecurityPutUserRequest) {
 		r.FilterPath = v
@@ -187,7 +191,6 @@ func (f SecurityPutUser) WithFilterPath(v ...string) func(*SecurityPutUserReques
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f SecurityPutUser) WithHeader(h map[string]string) func(*SecurityPutUserRequest) {
 	return func(r *SecurityPutUserRequest) {
 		if r.Header == nil {
@@ -200,7 +203,6 @@ func (f SecurityPutUser) WithHeader(h map[string]string) func(*SecurityPutUserRe
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f SecurityPutUser) WithOpaqueID(s string) func(*SecurityPutUserRequest) {
 	return func(r *SecurityPutUserRequest) {
 		if r.Header == nil {
