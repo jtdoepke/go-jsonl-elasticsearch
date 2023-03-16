@@ -96,7 +96,7 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 		log.Printf("Got %d (%d) records\n", count, v.Hits.Total.Value)
 		c <- v
 
-		if len(v.Hits.Hits) < batchSize {
+		if len(v.Hits.Hits) == 0 {
 			break
 		}
 
