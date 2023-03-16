@@ -1,6 +1,6 @@
 module github.com/sfomuseum/go-jsonl-elasticsearch
 
-go 1.18
+go 1.20
 
 require (
 	github.com/aaronland/go-jsonl v0.0.18
