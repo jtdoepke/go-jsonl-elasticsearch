@@ -118,8 +118,6 @@ func writeDocuments(ctx context.Context, c <-chan *model.ESResponse) error {
 	}
 	wr := io.MultiWriter(writers...)
 
-	count := 0
-
 	for {
 		select {
 		case <-ctx.Done():
@@ -132,9 +130,8 @@ func writeDocuments(ctx context.Context, c <-chan *model.ESResponse) error {
 				}
 				wr.Write(enc_rec)
 				wr.Write([]byte("\n"))
-				PutResponse(resp)
 			}
-			count += len(resp.Hits.Hits)
+			PutResponse(resp)
 		}
 	}
 }
