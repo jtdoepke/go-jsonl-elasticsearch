@@ -6,16 +6,18 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/aaronland/go-jsonl/walk"
-	"github.com/cenkalti/backoff/v4"
-	"github.com/elastic/go-elasticsearch/v7"
-	"github.com/elastic/go-elasticsearch/v7/esutil"
-	"github.com/sfomuseum/go-jsonl-elasticsearch/model"
-	"github.com/tidwall/pretty"
 	"log"
 	"os"
 	"runtime"
 	"time"
+
+	"github.com/aaronland/go-jsonl/walk"
+	"github.com/cenkalti/backoff/v4"
+	"github.com/elastic/go-elasticsearch/v7"
+	"github.com/elastic/go-elasticsearch/v7/esutil"
+	"github.com/tidwall/pretty"
+
+	"github.com/sfomuseum/go-jsonl-elasticsearch/model"
 )
 
 func main() {

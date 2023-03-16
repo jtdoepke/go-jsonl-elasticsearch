@@ -1,5 +1,7 @@
 package model
 
+import "encoding/json"
+
 type ESResponse struct {
 	ScrollID string         `json:"_scroll_id"`
 	Hits     ESResponseHits `json:"hits"`
@@ -16,7 +18,7 @@ type ESResponseHits struct {
 }
 
 type ESHit struct {
-	ID     string      `json:"_id"`
-	Index  string      `json:"_index"`
-	Source interface{} `json:"_source"`
+	ID     string          `json:"_id"`
+	Index  string          `json:"_index"`
+	Source json.RawMessage `json:"_source"`
 }
