@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -14,7 +13,6 @@ import (
 	"time"
 
 	"github.com/elastic/go-elasticsearch/v5"
-	"github.com/elastic/go-elasticsearch/v5/esapi"
 	"github.com/sourcegraph/conc/pool"
 
 	"github.com/sfomuseum/go-jsonl-elasticsearch/model"
@@ -58,33 +56,19 @@ func main() {
 }
 
 func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
-	const batchSize = 1000
 	count := 0
-	scroll_id := ""
+	query := `{ "query": { "match_all": {} } }`
+	resp, err := es_client.Search(
+		es_client.Search.WithContext(ctx),
+		es_client.Search.WithIndex(*es_index),
+		es_client.Search.WithBody(strings.NewReader(query)),
+		es_client.Search.WithScroll(1*time.Minute),
+		es_client.Search.WithSize(1000),
+	)
+	if err != nil {
+		return err
+	}
 	for {
-		query := `{ "query": { "match_all": {} } }`
-
-		var resp *esapi.Response
-		var err error
-
-		if scroll_id != "" {
-			query = fmt.Sprintf(`{ "scroll": "5m", "scroll_id": "%s" }`, scroll_id)
-			resp, err = es_client.Scroll(
-				es_client.Scroll.WithBody(strings.NewReader(query)),
-			)
-		} else {
-			resp, err = es_client.Search(
-				es_client.Search.WithContext(context.Background()),
-				es_client.Search.WithIndex(*es_index),
-				es_client.Search.WithBody(strings.NewReader(query)),
-				es_client.Search.WithScroll(1*time.Minute),
-				es_client.Search.WithSize(1000),
-			)
-		}
-		if err != nil {
-			return err
-		}
-
 		v := GetResponse()
 		err = json.NewDecoder(resp.Body).Decode(v)
 		resp.Body.Close()
@@ -94,15 +78,25 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 
 		count += len(v.Hits.Hits)
 		log.Printf("Got %d (%d) records\n", count, v.Hits.Total.Value)
-		c <- v
-
-		if len(v.Hits.Hits) == 0 {
+		if len(v.Hits.Hits) > 0 {
+			c <- v
+		}
+		if count >= v.Hits.Total.Value {
+			log.Printf("stopping because count is >= total docs")
+			break
+		}
+		if v.ScrollID == "" {
+			log.Printf("stopping because ScrollID is empty")
 			break
 		}
 
-		scroll_id = v.ScrollID
-		if scroll_id == "" {
-			break
+		resp, err = es_client.Scroll(
+			es_client.Scroll.WithContext(ctx),
+			es_client.Scroll.WithScrollID(v.ScrollID),
+			es_client.Scroll.WithScroll(5*time.Minute),
+		)
+		if err != nil {
+			return err
 		}
 	}
 
