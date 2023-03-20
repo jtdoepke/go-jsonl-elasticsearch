@@ -91,10 +91,8 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 	total := countResp.Count
 
 	count := 0
-	var searchAfter []json.RawMessage
 	const size = 1000
 	for {
-		body.SearchAfter = searchAfter
 		resp, err = es_client.Search(
 			es_client.Search.WithContext(ctx),
 			es_client.Search.WithBody(esutil.NewJSONReader(body)),
@@ -125,7 +123,8 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 			log.Printf("stopping because SearchAfter is empty")
 			break
 		}
-		searchAfter = v.SearchAfter
+		body.SearchAfter = v.SearchAfter
+		body.PointInTime = v.PointInTime
 	}
 
 	return nil
