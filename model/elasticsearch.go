@@ -29,7 +29,7 @@ type ESQuery struct {
 	Query       json.RawMessage   `json:"query"`
 	Sort        []json.RawMessage `json:"sort,omitempty"`
 	SearchAfter []json.RawMessage `json:"search_after,omitempty"`
-	PointInTime ESPIT             `json:"pit,omitempty"`
+	// PointInTime ESPIT             `json:"pit,omitempty"`
 }
 
 type ESPIT struct {
