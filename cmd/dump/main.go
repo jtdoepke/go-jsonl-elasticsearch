@@ -57,6 +57,7 @@ func main() {
 
 func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 	count := 0
+	total := 0
 	query := `{ "query": { "match_all": {} } }`
 	resp, err := es_client.Search(
 		es_client.Search.WithContext(ctx),
@@ -76,12 +77,15 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 			return err
 		}
 
+		if v.Hits.Total.Value > total {
+			total = v.Hits.Total.Value
+		}
 		count += len(v.Hits.Hits)
-		log.Printf("Got %d (%d) records\n", count, v.Hits.Total.Value)
+		log.Printf("Got %d (%d) records\n", count, total)
 		if len(v.Hits.Hits) > 0 {
 			c <- v
 		}
-		if count >= v.Hits.Total.Value {
+		if count >= total {
 			log.Printf("stopping because count is >= total docs")
 			break
 		}
