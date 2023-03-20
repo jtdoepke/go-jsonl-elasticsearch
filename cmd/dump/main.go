@@ -55,29 +55,29 @@ func main() {
 }
 
 func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
-	resp, err := es_client.OpenPointInTime([]string{*es_index}, "1m", es_client.OpenPointInTime.WithContext(ctx))
-	if err != nil {
-		return err
-	}
-	pit := &model.ESPIT{}
-	if err = json.NewDecoder(resp.Body).Decode(pit); err != nil {
-		return err
-	}
-	defer func() {
-		es_client.ClosePointInTime(
-			es_client.ClosePointInTime.WithBody(esutil.NewJSONReader(pit)),
-		)
-	}()
+	// resp, err := es_client.OpenPointInTime([]string{*es_index}, "1m", es_client.OpenPointInTime.WithContext(ctx))
+	// if err != nil {
+	// 	return err
+	// }
+	// pit := &model.ESPIT{}
+	// if err = json.NewDecoder(resp.Body).Decode(pit); err != nil {
+	// 	return err
+	// }
+	// defer func() {
+	// 	es_client.ClosePointInTime(
+	// 		es_client.ClosePointInTime.WithBody(esutil.NewJSONReader(pit)),
+	// 	)
+	// }()
 
 	body := &model.ESQuery{
 		Query: json.RawMessage(`{"match_all":{}}`),
 		Sort: []json.RawMessage{
 			json.RawMessage(`{"@timestamp": {"order": "asc"}}`),
 		},
-		PointInTime: *pit,
+		// PointInTime: *pit,
 	}
 
-	resp, err = es_client.Count(
+	resp, err := es_client.Count(
 		es_client.Count.WithContext(ctx),
 		es_client.Count.WithIndex(*es_index),
 	)
@@ -130,7 +130,7 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 			break
 		}
 		body.SearchAfter = r.SearchAfter
-		body.PointInTime = r.PointInTime
+		// body.PointInTime = r.PointInTime
 	}
 
 	return nil
