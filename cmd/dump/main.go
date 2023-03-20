@@ -4,6 +4,7 @@ import (
 	_ "bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"io"
 	"log"
@@ -113,6 +114,9 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 		if err := json.Unmarshal(b, r); err != nil {
 			return err
 		}
+		if len(r.Error) > 0 {
+			return errors.New(string(r.Error))
+		}
 
 		count += len(r.Hits.Hits)
 		log.Printf("Got %d (%d) records\n", count, total)
@@ -121,12 +125,10 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 		}
 		if len(r.Hits.Hits) < size {
 			log.Printf("stopping because got less than requested hits")
-			log.Printf("%s", b)
 			break
 		}
 		if len(r.SearchAfter) == 0 {
 			log.Printf("stopping because SearchAfter is empty")
-			log.Printf("%s", b)
 			break
 		}
 		body.SearchAfter = r.SearchAfter

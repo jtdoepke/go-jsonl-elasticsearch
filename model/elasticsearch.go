@@ -3,6 +3,7 @@ package model
 import "encoding/json"
 
 type ESResponse struct {
+	Error       json.RawMessage   `json:"error,omniempty"`
 	ScrollID    string            `json:"_scroll_id"`
 	Hits        ESResponseHits    `json:"hits"`
 	PointInTime ESPIT             `json:"pit,omitempty"`
