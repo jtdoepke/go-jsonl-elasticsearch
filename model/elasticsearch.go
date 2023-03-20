@@ -21,9 +21,10 @@ type ESResponseHits struct {
 }
 
 type ESHit struct {
-	ID     string          `json:"_id"`
-	Index  string          `json:"_index"`
-	Source json.RawMessage `json:"_source"`
+	ID     string            `json:"_id"`
+	Index  string            `json:"_index"`
+	Source json.RawMessage   `json:"_source"`
+	Sort   []json.RawMessage `json:"sort,omitempty"`
 }
 
 type ESQuery struct {

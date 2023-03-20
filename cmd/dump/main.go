@@ -100,6 +100,9 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 			es_client.Search.WithSize(size),
 			es_client.Search.WithTrackTotalHits(false),
 			es_client.Search.WithIndex(*es_index),
+			es_client.Search.WithSort("_doc"),
+			es_client.Search.WithSource("true"),
+			es_client.Search.WithTrackScores(false),
 		)
 		if err != nil {
 			return err
@@ -121,18 +124,14 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 		count += len(r.Hits.Hits)
 		log.Printf("Got %d (%d) records\n", count, total)
 		if len(r.Hits.Hits) > 0 {
+			body.SearchAfter = r.Hits.Hits[len(r.Hits.Hits)-1].Sort
+			// body.PointInTime = r.PointInTime
 			c <- r
 		}
 		if len(r.Hits.Hits) < size {
 			log.Printf("stopping because got less than requested hits")
 			break
 		}
-		if len(r.SearchAfter) == 0 {
-			log.Printf("stopping because SearchAfter is empty")
-			break
-		}
-		body.SearchAfter = r.SearchAfter
-		// body.PointInTime = r.PointInTime
 	}
 
 	return nil
@@ -158,6 +157,7 @@ outer:
 				break outer
 			}
 			for _, rec := range resp.Hits.Hits {
+				rec.Sort = nil
 				enc_rec, err := json.Marshal(rec)
 				if err != nil {
 					return err
