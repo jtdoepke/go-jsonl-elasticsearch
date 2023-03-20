@@ -104,28 +104,33 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 			return err
 		}
 
-		v := GetResponse()
-		err = json.NewDecoder(resp.Body).Decode(v)
+		r := GetResponse()
+		b, err := io.ReadAll(resp.Body)
 		resp.Body.Close()
 		if err != nil {
 			return err
 		}
+		if err := json.Unmarshal(b, r); err != nil {
+			return err
+		}
 
-		count += len(v.Hits.Hits)
+		count += len(r.Hits.Hits)
 		log.Printf("Got %d (%d) records\n", count, total)
-		if len(v.Hits.Hits) > 0 {
-			c <- v
+		if len(r.Hits.Hits) > 0 {
+			c <- r
 		}
-		if len(v.Hits.Hits) < size {
+		if len(r.Hits.Hits) < size {
 			log.Printf("stopping because got less than requested hits")
+			log.Printf("%s", b)
 			break
 		}
-		if len(v.SearchAfter) == 0 {
+		if len(r.SearchAfter) == 0 {
 			log.Printf("stopping because SearchAfter is empty")
+			log.Printf("%s", b)
 			break
 		}
-		body.SearchAfter = v.SearchAfter
-		body.PointInTime = v.PointInTime
+		body.SearchAfter = r.SearchAfter
+		body.PointInTime = r.PointInTime
 	}
 
 	return nil
