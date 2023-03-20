@@ -70,7 +70,7 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 	}()
 
 	body := &model.ESQuery{
-		Query: json.RawMessage(`{ "query": { "match_all": {} } }`),
+		Query: json.RawMessage(`{"query":{"match_all":{}}}`),
 		Sort: []json.RawMessage{
 			json.RawMessage(`{"@timestamp": {"order": "asc", "format": "strict_date_optional_time_nanos", "numeric_type" : "date_nanos" }}`),
 		},
@@ -98,6 +98,7 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 			es_client.Search.WithBody(esutil.NewJSONReader(body)),
 			es_client.Search.WithSize(size),
 			es_client.Search.WithTrackTotalHits(false),
+			es_client.Search.WithIndex(*es_index),
 		)
 		if err != nil {
 			return err
