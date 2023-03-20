@@ -5,7 +5,6 @@ go 1.20
 require (
 	github.com/aaronland/go-jsonl v0.0.18
 	github.com/cenkalti/backoff/v4 v4.2.0
-	github.com/elastic/go-elasticsearch/v5 v5.6.1
 	github.com/elastic/go-elasticsearch/v7 v7.17.7
 	github.com/sourcegraph/conc v0.3.0
 	github.com/tidwall/pretty v1.2.1

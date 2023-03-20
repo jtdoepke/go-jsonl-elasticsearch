@@ -8,11 +8,10 @@ import (
 	"io"
 	"log"
 	"os"
-	"strings"
 	"sync"
-	"time"
 
-	"github.com/elastic/go-elasticsearch/v5"
+	"github.com/elastic/go-elasticsearch/v7"
+	"github.com/elastic/go-elasticsearch/v7/esutil"
 	"github.com/sourcegraph/conc/pool"
 
 	"github.com/sfomuseum/go-jsonl-elasticsearch/model"
@@ -56,20 +55,56 @@ func main() {
 }
 
 func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
-	count := 0
-	total := 0
-	query := `{ "query": { "match_all": {} } }`
-	resp, err := es_client.Search(
-		es_client.Search.WithContext(ctx),
-		es_client.Search.WithIndex(*es_index),
-		es_client.Search.WithBody(strings.NewReader(query)),
-		es_client.Search.WithScroll(1*time.Minute),
-		es_client.Search.WithSize(1000),
+	resp, err := es_client.OpenPointInTime([]string{*es_index}, "1m", es_client.OpenPointInTime.WithContext(ctx))
+	if err != nil {
+		return err
+	}
+	pit := &model.ESPIT{}
+	if err = json.NewDecoder(resp.Body).Decode(pit); err != nil {
+		return err
+	}
+	defer func() {
+		es_client.ClosePointInTime(
+			es_client.ClosePointInTime.WithBody(esutil.NewJSONReader(pit)),
+		)
+	}()
+
+	body := &model.ESQuery{
+		Query: json.RawMessage(`{ "query": { "match_all": {} } }`),
+		Sort: []json.RawMessage{
+			json.RawMessage(`{"@timestamp": {"order": "asc", "format": "strict_date_optional_time_nanos", "numeric_type" : "date_nanos" }}`),
+		},
+		PointInTime: *pit,
+	}
+
+	resp, err = es_client.Count(
+		es_client.Count.WithContext(ctx),
+		es_client.Count.WithIndex(*es_index),
 	)
 	if err != nil {
 		return err
 	}
+	countResp := &model.ESCountResponse{}
+	if err = json.NewDecoder(resp.Body).Decode(countResp); err != nil {
+		return err
+	}
+	total := countResp.Count
+
+	count := 0
+	var searchAfter []json.RawMessage
+	const size = 1000
 	for {
+		body.SearchAfter = searchAfter
+		resp, err = es_client.Search(
+			es_client.Search.WithContext(ctx),
+			es_client.Search.WithBody(esutil.NewJSONReader(body)),
+			es_client.Search.WithSize(size),
+			es_client.Search.WithTrackTotalHits(false),
+		)
+		if err != nil {
+			return err
+		}
+
 		v := GetResponse()
 		err = json.NewDecoder(resp.Body).Decode(v)
 		resp.Body.Close()
@@ -77,31 +112,20 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 			return err
 		}
 
-		if v.Hits.Total.Value > total {
-			total = v.Hits.Total.Value
-		}
 		count += len(v.Hits.Hits)
 		log.Printf("Got %d (%d) records\n", count, total)
 		if len(v.Hits.Hits) > 0 {
 			c <- v
 		}
-		if count >= total {
-			log.Printf("stopping because count is >= total docs")
+		if len(v.Hits.Hits) < size {
+			log.Printf("stopping because got less than requested hits")
 			break
 		}
-		if v.ScrollID == "" {
-			log.Printf("stopping because ScrollID is empty")
+		if len(v.SearchAfter) == 0 {
+			log.Printf("stopping because SearchAfter is empty")
 			break
 		}
-
-		resp, err = es_client.Scroll(
-			es_client.Scroll.WithContext(ctx),
-			es_client.Scroll.WithScrollID(v.ScrollID),
-			es_client.Scroll.WithScroll(5*time.Minute),
-		)
-		if err != nil {
-			return err
-		}
+		searchAfter = v.SearchAfter
 	}
 
 	return nil
