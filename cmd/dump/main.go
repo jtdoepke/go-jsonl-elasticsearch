@@ -3,7 +3,6 @@ package main
 import (
 	_ "bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"flag"
 	"io"
@@ -14,6 +13,7 @@ import (
 	retry "github.com/avast/retry-go"
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/elastic/go-elasticsearch/v7/esutil"
+	json "github.com/goccy/go-json"
 	"github.com/sourcegraph/conc/pool"
 
 	"github.com/sfomuseum/go-jsonl-elasticsearch/model"

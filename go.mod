@@ -7,6 +7,7 @@ require (
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/cenkalti/backoff/v4 v4.2.0
 	github.com/elastic/go-elasticsearch/v7 v7.17.7
+	github.com/goccy/go-json v0.10.2
 	github.com/sourcegraph/conc v0.3.0
 	github.com/tidwall/pretty v1.2.1
 )
