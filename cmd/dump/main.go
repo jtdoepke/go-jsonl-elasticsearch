@@ -43,7 +43,7 @@ func main() {
 
 	ctx := context.Background()
 	p := pool.New().WithContext(ctx).WithCancelOnError()
-	c := make(chan *model.ESResponse, 1)
+	c := make(chan *model.ESResponse, 10)
 	p.Go(func(ctx context.Context) error {
 		defer close(c)
 		return readIndex(ctx, c)
