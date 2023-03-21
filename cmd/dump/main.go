@@ -11,6 +11,7 @@ import (
 	"os"
 	"sync"
 
+	retry "github.com/avast/retry-go"
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/elastic/go-elasticsearch/v7/esutil"
 	"github.com/sourcegraph/conc/pool"
@@ -94,31 +95,36 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 	count := 0
 	const size = 1000
 	for {
-		resp, err = es_client.Search(
-			es_client.Search.WithContext(ctx),
-			es_client.Search.WithBody(esutil.NewJSONReader(body)),
-			es_client.Search.WithSize(size),
-			es_client.Search.WithTrackTotalHits(false),
-			es_client.Search.WithIndex(*es_index),
-			es_client.Search.WithSort("_doc"),
-			es_client.Search.WithSource("true"),
-			es_client.Search.WithTrackScores(false),
-		)
-		if err != nil {
-			return err
-		}
-
 		r := GetResponse()
-		b, err := io.ReadAll(resp.Body)
-		resp.Body.Close()
+		err := retry.Do(func() error {
+			resp, err = es_client.Search(
+				es_client.Search.WithContext(ctx),
+				es_client.Search.WithBody(esutil.NewJSONReader(body)),
+				es_client.Search.WithSize(size),
+				es_client.Search.WithTrackTotalHits(false),
+				es_client.Search.WithIndex(*es_index),
+				es_client.Search.WithSort("_doc"),
+				es_client.Search.WithSource("true"),
+				es_client.Search.WithTrackScores(false),
+			)
+			if err != nil {
+				return err
+			}
+			b, err := io.ReadAll(resp.Body)
+			resp.Body.Close()
+			if err != nil {
+				return err
+			}
+			if err := json.Unmarshal(b, r); err != nil {
+				return err
+			}
+			if len(r.Error) > 0 {
+				return errors.New(string(r.Error))
+			}
+			return nil
+		})
 		if err != nil {
 			return err
-		}
-		if err := json.Unmarshal(b, r); err != nil {
-			return err
-		}
-		if len(r.Error) > 0 {
-			return errors.New(string(r.Error))
 		}
 
 		count += len(r.Hits.Hits)

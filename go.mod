@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/aaronland/go-jsonl v0.0.18
+	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/cenkalti/backoff/v4 v4.2.0
 	github.com/elastic/go-elasticsearch/v7 v7.17.7
 	github.com/sourcegraph/conc v0.3.0
