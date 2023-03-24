@@ -23,6 +23,7 @@ import (
 var (
 	es_endpoint = flag.String("elasticsearch-endpoint", "", "The name of the Elasticsearch host to query.")
 	es_index    = flag.String("elasticsearch-index", "", "The name of the Elasticsearch index to dump.")
+	size        = flag.Int("size", 1000, "ES request batch size")
 
 	null   = flag.Bool("null", false, "Output to /dev/null.")
 	stdout = flag.Bool("stdout", true, "Output to STDOUT.")
@@ -93,14 +94,13 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 	total := countResp.Count
 
 	count := 0
-	const size = 1000
 	for {
 		r := GetResponse()
 		err := retry.Do(func() error {
 			resp, err = es_client.Search(
 				es_client.Search.WithContext(ctx),
 				es_client.Search.WithBody(esutil.NewJSONReader(body)),
-				es_client.Search.WithSize(size),
+				es_client.Search.WithSize(*size),
 				es_client.Search.WithTrackTotalHits(false),
 				es_client.Search.WithIndex(*es_index),
 				es_client.Search.WithSort("_doc"),
@@ -134,7 +134,7 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 			// body.PointInTime = r.PointInTime
 			c <- r
 		}
-		if len(r.Hits.Hits) < size {
+		if len(r.Hits.Hits) < *size {
 			log.Printf("stopping because got less than requested hits")
 			break
 		}
