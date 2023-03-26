@@ -10,6 +10,7 @@ import (
 	"math"
 	"os"
 	"sync"
+	"time"
 
 	retry "github.com/avast/retry-go"
 	"github.com/elastic/go-elasticsearch/v7"
@@ -133,6 +134,7 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 				}
 				log.Panicf("setting request size to %d", reqSize)
 			}),
+			retry.MaxDelay(10*time.Second),
 		)
 		if err != nil {
 			return err
