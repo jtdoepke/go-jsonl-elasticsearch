@@ -7,6 +7,7 @@ import (
 	"flag"
 	"io"
 	"log"
+	"math"
 	"os"
 	"sync"
 
@@ -96,33 +97,42 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 	count := 0
 	for {
 		r := GetResponse()
-		err := retry.Do(func() error {
-			resp, err = es_client.Search(
-				es_client.Search.WithContext(ctx),
-				es_client.Search.WithBody(esutil.NewJSONReader(body)),
-				es_client.Search.WithSize(*size),
-				es_client.Search.WithTrackTotalHits(false),
-				es_client.Search.WithIndex(*es_index),
-				es_client.Search.WithSort("_doc"),
-				es_client.Search.WithSource("true"),
-				es_client.Search.WithTrackScores(false),
-			)
-			if err != nil {
-				return err
-			}
-			b, err := io.ReadAll(resp.Body)
-			resp.Body.Close()
-			if err != nil {
-				return err
-			}
-			if err := json.Unmarshal(b, r); err != nil {
-				return err
-			}
-			if len(r.Error) > 0 {
-				return errors.New(string(r.Error))
-			}
-			return nil
-		})
+		reqSize := *size
+		err := retry.Do(
+			func() error {
+				resp, err = es_client.Search(
+					es_client.Search.WithContext(ctx),
+					es_client.Search.WithBody(esutil.NewJSONReader(body)),
+					es_client.Search.WithSize(reqSize),
+					es_client.Search.WithTrackTotalHits(false),
+					es_client.Search.WithIndex(*es_index),
+					es_client.Search.WithSort("_doc"),
+					es_client.Search.WithSource("true"),
+					es_client.Search.WithTrackScores(false),
+				)
+				if err != nil {
+					return err
+				}
+				b, err := io.ReadAll(resp.Body)
+				resp.Body.Close()
+				if err != nil {
+					return err
+				}
+				if err := json.Unmarshal(b, r); err != nil {
+					return err
+				}
+				if len(r.Error) > 0 {
+					return errors.New(string(r.Error))
+				}
+				return nil
+			},
+			retry.OnRetry(func(n uint, err error) {
+				reqSize = (*size) / int(math.Pow(2, float64(n)))
+				if reqSize < 1 {
+					reqSize = 1
+				}
+			}),
+		)
 		if err != nil {
 			return err
 		}
