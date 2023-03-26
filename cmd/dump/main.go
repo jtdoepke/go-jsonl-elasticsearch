@@ -134,7 +134,7 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 				}
 				log.Printf("setting request size to %d", reqSize)
 			}),
-			retry.MaxDelay(10*time.Second),
+			retry.MaxDelay(5*time.Minute),
 		)
 		if err != nil {
 			return err
