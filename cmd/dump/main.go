@@ -76,9 +76,6 @@ func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 
 	body := &model.ESQuery{
 		Query: json.RawMessage(`{"match_all":{}}`),
-		Sort: []json.RawMessage{
-			json.RawMessage(`{"@timestamp": {"order": "asc"}}`),
-		},
 		// PointInTime: *pit,
 	}
 
