@@ -46,7 +46,7 @@ func main() {
 
 	ctx := context.Background()
 	p := pool.New().WithContext(ctx).WithCancelOnError()
-	c := make(chan *model.ESResponse, 10)
+	c := make(chan *model.ESSearchResponse, 10)
 	p.Go(func(ctx context.Context) error {
 		defer close(c)
 		return readIndex(ctx, c)
@@ -59,7 +59,7 @@ func main() {
 	}
 }
 
-func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
+func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 	// resp, err := es_client.OpenPointInTime([]string{*es_index}, "1m", es_client.OpenPointInTime.WithContext(ctx))
 	// if err != nil {
 	// 	return err
@@ -114,12 +114,9 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 				if err != nil {
 					return err
 				}
-				b, err := io.ReadAll(resp.Body)
+				err := json.NewDecoder(resp.Body).Decode(r)
 				resp.Body.Close()
 				if err != nil {
-					return err
-				}
-				if err := json.Unmarshal(b, r); err != nil {
 					return err
 				}
 				if len(r.Error) > 0 {
@@ -128,6 +125,38 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 				return nil
 			},
 			retry.OnRetry(func(n uint, err error) {
+				// Wait for circuit breakers to untrip
+			outer:
+				for {
+					log.Println("checking for tripped breakers...")
+					resp, err := es_client.Nodes.Stats(
+						es_client.Nodes.Stats.WithContext(ctx),
+						es_client.Nodes.Stats.WithMetric("breaker"),
+					)
+					if err != nil {
+						log.Fatal(err)
+					}
+					s := &model.ESNodeStatsResponse{}
+					err = json.NewDecoder(resp.Body).Decode(s)
+					resp.Body.Close()
+					if err != nil {
+						log.Fatal(err)
+					}
+					if s.Status.Failed > 0 {
+						time.Sleep(10 * time.Second)
+						continue
+					}
+					for _, n := range s.Nodes {
+						for _, b := range n.Breakers {
+							if b.Tripped > 0 {
+								time.Sleep(10 * time.Second)
+								continue outer
+							}
+						}
+					}
+					break
+				}
+
 				reqSize = (*size) / int(math.Pow(2, float64(n)))
 				if reqSize < 1 {
 					reqSize = 1
@@ -135,8 +164,8 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 				log.Printf("setting request size to %d", reqSize)
 				log.Printf("search after %+v", body.SearchAfter)
 			}),
-			retry.MaxDelay(5*time.Minute),
-			retry.MaxJitter(20*time.Second),
+			retry.MaxDelay(1*time.Minute),
+			retry.MaxJitter(10*time.Second),
 		)
 		if err != nil {
 			return err
@@ -158,7 +187,7 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 	return nil
 }
 
-func writeDocuments(ctx context.Context, c <-chan *model.ESResponse) error {
+func writeDocuments(ctx context.Context, c <-chan *model.ESSearchResponse) error {
 	writers := make([]io.Writer, 0)
 	if *null {
 		writers = append(writers, io.Discard)
@@ -193,20 +222,20 @@ outer:
 }
 
 var (
-	zeroResponse = &model.ESResponse{}
+	zeroResponse = &model.ESSearchResponse{}
 	responsePool = sync.Pool{
 		New: func() interface{} {
-			return new(model.ESResponse)
+			return new(model.ESSearchResponse)
 		},
 	}
 )
 
-func GetResponse() *model.ESResponse {
-	r := responsePool.Get().(*model.ESResponse)
+func GetResponse() *model.ESSearchResponse {
+	r := responsePool.Get().(*model.ESSearchResponse)
 	*r = *zeroResponse
 	return r
 }
 
-func PutResponse(r *model.ESResponse) {
+func PutResponse(r *model.ESSearchResponse) {
 	responsePool.Put(r)
 }
