@@ -148,7 +148,7 @@ func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 					}
 					for _, n := range s.Nodes {
 						for _, b := range n.Breakers {
-							if b.Tripped > 0 {
+							if b.EstimatedSizeInBytes >= b.LimitSizeInBytes {
 								time.Sleep(10 * time.Second)
 								continue outer
 							}

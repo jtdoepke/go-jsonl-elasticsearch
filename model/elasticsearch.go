@@ -52,12 +52,12 @@ type ESNodeStatsResponse struct {
 	Nodes map[string]struct {
 		Attributes map[string]string `json:"attributes"`
 		Breakers   map[string]struct {
-			EstimatedSize          string  `json:"estimated_size"`
-			EstimatedSize_in_bytes int64   `json:"estimated_size_in_bytes"`
-			LimitSize              string  `json:"limit_size"`
-			LimitSizeInBytes       int64   `json:"limit_size_in_bytes"`
-			Overhead               float64 `json:"overhead"`
-			Tripped                int     `json:"tripped"`
+			EstimatedSize        string  `json:"estimated_size"`
+			EstimatedSizeInBytes int64   `json:"estimated_size_in_bytes"`
+			LimitSize            string  `json:"limit_size"`
+			LimitSizeInBytes     int64   `json:"limit_size_in_bytes"`
+			Overhead             float64 `json:"overhead"`
+			Tripped              int     `json:"tripped"`
 		} `json:"breakers"`
 	} `json:"nodes"`
 }
