@@ -133,6 +133,7 @@ func readIndex(ctx context.Context, c chan<- *model.ESResponse) error {
 					reqSize = 1
 				}
 				log.Printf("setting request size to %d", reqSize)
+				log.Printf("search after %+v", body.SearchAfter)
 			}),
 			retry.MaxDelay(5*time.Minute),
 			retry.MaxJitter(20*time.Second),
