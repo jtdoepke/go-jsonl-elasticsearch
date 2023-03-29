@@ -26,6 +26,7 @@ var (
 	es_endpoint = flag.String("elasticsearch-endpoint", "", "The name of the Elasticsearch host to query.")
 	es_index    = flag.String("elasticsearch-index", "", "The name of the Elasticsearch index to dump.")
 	size        = flag.Int("size", 1000, "ES request batch size")
+	searchAfter = flag.String("search-after", "", "Start searching from here.")
 
 	null   = flag.Bool("null", false, "Output to /dev/null.")
 	stdout = flag.Bool("stdout", true, "Output to STDOUT.")
@@ -77,6 +78,13 @@ func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 	body := &model.ESQuery{
 		Query: json.RawMessage(`{"match_all":{}}`),
 		// PointInTime: *pit,
+	}
+	if *searchAfter != "" {
+		var v []json.RawMessage
+		if err := json.Unmarshal([]byte(*searchAfter), &v); err != nil {
+			log.Fatal(err)
+		}
+		body.SearchAfter = v
 	}
 
 	resp, err := es_client.Count(
