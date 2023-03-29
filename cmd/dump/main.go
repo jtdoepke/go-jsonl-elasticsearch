@@ -87,7 +87,7 @@ func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 		resp, err := es_client.Search(
 			es_client.Search.WithContext(ctx),
 			es_client.Search.WithBody(esutil.NewJSONReader(b)),
-			es_client.Search.WithSize(*size),
+			es_client.Search.WithSize(1),
 			es_client.Search.WithTrackTotalHits(false),
 			es_client.Search.WithIndex(*es_index),
 			es_client.Search.WithSort("_doc"),
