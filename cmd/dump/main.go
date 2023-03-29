@@ -175,8 +175,9 @@ func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 			// body.PointInTime = r.PointInTime
 			c <- r
 		}
-		if len(r.Hits.Hits) < *size {
-			log.Printf("stopping because got less than requested hits")
+		if len(r.Hits.Hits) == 0 {
+			log.Printf("stopping because got zero hits")
+			log.Printf("last search after %+v", body.SearchAfter)
 			break
 		}
 	}
