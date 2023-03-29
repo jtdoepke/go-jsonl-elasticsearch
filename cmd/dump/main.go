@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"math"
@@ -26,7 +27,7 @@ var (
 	es_endpoint = flag.String("elasticsearch-endpoint", "", "The name of the Elasticsearch host to query.")
 	es_index    = flag.String("elasticsearch-index", "", "The name of the Elasticsearch index to dump.")
 	size        = flag.Int("size", 1000, "ES request batch size")
-	searchAfter = flag.String("search-after", "", "Start searching from here.")
+	startFrom   = flag.String("start-from-id", "", "Start searching after the doc with this ID.")
 
 	null   = flag.Bool("null", false, "Output to /dev/null.")
 	stdout = flag.Bool("stdout", true, "Output to STDOUT.")
@@ -79,12 +80,31 @@ func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 		Query: json.RawMessage(`{"match_all":{}}`),
 		// PointInTime: *pit,
 	}
-	if *searchAfter != "" {
-		var v []json.RawMessage
-		if err := json.Unmarshal([]byte(*searchAfter), &v); err != nil {
-			log.Fatal(err)
+	if *startFrom != "" {
+		b := &model.ESQuery{
+			Query: json.RawMessage(fmt.Sprintf(`{"term":{"ids": {"values": ["%s"]}}}`, *startFrom)),
 		}
-		body.SearchAfter = v
+		resp, err := es_client.Search(
+			es_client.Search.WithContext(ctx),
+			es_client.Search.WithBody(esutil.NewJSONReader(b)),
+			es_client.Search.WithSize(1),
+			es_client.Search.WithTrackTotalHits(false),
+			es_client.Search.WithIndex(*es_index),
+			es_client.Search.WithSort("_doc"),
+			es_client.Search.WithSource("true"),
+			es_client.Search.WithTrackScores(false),
+		)
+		if err != nil {
+			return err
+		}
+		r := GetResponse()
+		err = json.NewDecoder(resp.Body).Decode(r)
+		resp.Body.Close()
+		if err != nil {
+			return err
+		}
+		body.SearchAfter = r.Hits.Hits[len(r.Hits.Hits)-1].Sort
+		PutResponse(r)
 	}
 
 	resp, err := es_client.Count(
