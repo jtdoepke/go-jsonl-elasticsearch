@@ -233,7 +233,6 @@ outer:
 				break outer
 			}
 			for _, rec := range resp.Hits.Hits {
-				rec.Sort = nil
 				enc_rec, err := json.Marshal(rec)
 				if err != nil {
 					return err
