@@ -5,10 +5,8 @@ import (
 	"context"
 	"errors"
 	"flag"
-	"fmt"
 	"io"
 	"log"
-	"math"
 	"os"
 	"sync"
 	"time"
@@ -26,8 +24,7 @@ import (
 var (
 	es_endpoint = flag.String("elasticsearch-endpoint", "", "The name of the Elasticsearch host to query.")
 	es_index    = flag.String("elasticsearch-index", "", "The name of the Elasticsearch index to dump.")
-	size        = flag.Int("size", 1000, "ES request batch size")
-	startFrom   = flag.String("start-from-id", "", "Start searching after the doc with this ID.")
+	size        = flag.Int("size", 100, "ES request batch size")
 
 	null   = flag.Bool("null", false, "Output to /dev/null.")
 	stdout = flag.Bool("stdout", true, "Output to STDOUT.")
@@ -80,32 +77,6 @@ func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 		Query: json.RawMessage(`{"match_all":{}}`),
 		// PointInTime: *pit,
 	}
-	if *startFrom != "" {
-		b := &model.ESQuery{
-			Query: json.RawMessage(fmt.Sprintf(`{"ids":{"values": ["%s"]}}`, *startFrom)),
-		}
-		resp, err := es_client.Search(
-			es_client.Search.WithContext(ctx),
-			es_client.Search.WithBody(esutil.NewJSONReader(b)),
-			es_client.Search.WithSize(1),
-			es_client.Search.WithTrackTotalHits(false),
-			es_client.Search.WithIndex(*es_index),
-			es_client.Search.WithSort("_doc"),
-			es_client.Search.WithSource("true"),
-			es_client.Search.WithTrackScores(false),
-		)
-		if err != nil {
-			return err
-		}
-		r := GetResponse()
-		err = json.NewDecoder(resp.Body).Decode(r)
-		resp.Body.Close()
-		if err != nil {
-			return err
-		}
-		body.SearchAfter = r.Hits.Hits[len(r.Hits.Hits)-1].Sort
-		PutResponse(r)
-	}
 
 	resp, err := es_client.Count(
 		es_client.Count.WithContext(ctx),
@@ -120,22 +91,30 @@ func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 	}
 	total := countResp.Count
 
+	scrollID := ""
+
 	count := 0
 	for {
 		r := GetResponse()
-		reqSize := *size
 		err := retry.Do(
 			func() error {
-				resp, err = es_client.Search(
-					es_client.Search.WithContext(ctx),
-					es_client.Search.WithBody(esutil.NewJSONReader(body)),
-					es_client.Search.WithSize(reqSize),
-					es_client.Search.WithTrackTotalHits(false),
-					es_client.Search.WithIndex(*es_index),
-					es_client.Search.WithSort("_doc"),
-					es_client.Search.WithSource("true"),
-					es_client.Search.WithTrackScores(false),
-				)
+				if scrollID == "" {
+					resp, err = es_client.Search(
+						es_client.Search.WithContext(ctx),
+						es_client.Search.WithBody(esutil.NewJSONReader(body)),
+						es_client.Search.WithSize(*size),
+						es_client.Search.WithTrackTotalHits(false),
+						es_client.Search.WithIndex(*es_index),
+						es_client.Search.WithSort("_doc"),
+						es_client.Search.WithSource("true"),
+						es_client.Search.WithTrackScores(false),
+					)
+				} else {
+					resp, err = es_client.Scroll(
+						es_client.Scroll.WithContext(ctx),
+						es_client.Scroll.WithScrollID(scrollID),
+					)
+				}
 				if err != nil {
 					return err
 				}
@@ -181,13 +160,6 @@ func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 					}
 					break
 				}
-
-				reqSize = (*size) / int(math.Pow(2, float64(n)))
-				if reqSize < 1 {
-					reqSize = 1
-				}
-				log.Printf("setting request size to %d", reqSize)
-				log.Printf("search after %+v", body.SearchAfter)
 			}),
 			retry.MaxDelay(1*time.Minute),
 			retry.MaxJitter(10*time.Second),
@@ -199,13 +171,10 @@ func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 		count += len(r.Hits.Hits)
 		log.Printf("Got %d (%d) records\n", count, total)
 		if len(r.Hits.Hits) > 0 {
-			body.SearchAfter = r.Hits.Hits[len(r.Hits.Hits)-1].Sort
-			// body.PointInTime = r.PointInTime
 			c <- r
-		}
-		if len(r.Hits.Hits) == 0 {
+			scrollID = r.ScrollID
+		} else {
 			log.Printf("stopping because got zero hits")
-			log.Printf("last search after %+v", body.SearchAfter)
 			break
 		}
 	}
