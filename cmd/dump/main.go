@@ -172,6 +172,9 @@ func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 		log.Printf("Got %d (%d) records\n", count, total)
 		if len(r.Hits.Hits) > 0 {
 			c <- r
+			if count >= total {
+				break
+			}
 			scrollID = r.ScrollID
 		} else {
 			log.Printf("stopping because got zero hits")
