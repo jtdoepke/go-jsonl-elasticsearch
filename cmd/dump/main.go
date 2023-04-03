@@ -103,16 +103,17 @@ func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 						es_client.Search.WithContext(ctx),
 						es_client.Search.WithBody(esutil.NewJSONReader(body)),
 						es_client.Search.WithSize(*size),
-						es_client.Search.WithTrackTotalHits(false),
+						es_client.Search.WithTrackScores(false),
 						es_client.Search.WithIndex(*es_index),
 						es_client.Search.WithSort("_doc"),
 						es_client.Search.WithSource("true"),
-						es_client.Search.WithTrackScores(false),
+						es_client.Search.WithScroll(1*time.Minute),
 					)
 				} else {
 					resp, err = es_client.Scroll(
 						es_client.Scroll.WithContext(ctx),
 						es_client.Scroll.WithScrollID(scrollID),
+						es_client.Scroll.WithScroll(1*time.Minute),
 					)
 				}
 				if err != nil {
@@ -168,16 +169,17 @@ func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 			return err
 		}
 
-		count += len(r.Hits.Hits)
-		log.Printf("Got %d (%d) records\n", count, total)
-		if len(r.Hits.Hits) > 0 {
-			c <- r
-			if count >= total {
-				break
-			}
+		if n := len(r.Hits.Hits); n > 0 {
+			count += n
+			log.Printf("Got %d (%d) records\n", count, total)
 			scrollID = r.ScrollID
+			c <- r
 		} else {
 			log.Printf("stopping because got zero hits")
+			break
+		}
+		if count >= total {
+			log.Printf("stopping because count is greater than or equal to total hits")
 			break
 		}
 	}
