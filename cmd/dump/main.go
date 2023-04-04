@@ -92,6 +92,13 @@ func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 	total := countResp.Count
 
 	scrollID := ""
+	defer func() {
+		if scrollID != "" {
+			_, _ = es_client.ClearScroll(
+				es_client.ClearScroll.WithScrollID(scrollID),
+			)
+		}
+	}()
 
 	count := 0
 	for {
