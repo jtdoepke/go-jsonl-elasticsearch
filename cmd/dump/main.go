@@ -107,13 +107,13 @@ func readIndex(ctx context.Context, c chan<- *model.ESSearchResponse) error {
 						es_client.Search.WithIndex(*es_index),
 						es_client.Search.WithSort("_doc"),
 						es_client.Search.WithSource("true"),
-						es_client.Search.WithScroll(1*time.Minute),
+						es_client.Search.WithScroll(10*time.Minute),
 					)
 				} else {
 					resp, err = es_client.Scroll(
 						es_client.Scroll.WithContext(ctx),
 						es_client.Scroll.WithScrollID(scrollID),
-						es_client.Scroll.WithScroll(1*time.Minute),
+						es_client.Scroll.WithScroll(10*time.Minute),
 					)
 				}
 				if err != nil {
